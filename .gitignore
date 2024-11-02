@@ -1,0 +1,65 @@
+﻿# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+
+debug.log
+
+# Installer logs
+debug.log
+
+# PyInstaller
+# Usually these files are written by a python script from a template
+*.manifest
+*.spec
+
+# pyenv
+.python-version
+
+# Environments
+.env
+.venv
+ENV/
+venv/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# VS Code
+.vscode/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Python virtual environment
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Other
+*.bak
+~$*.*
+*.tmp
+*.temp
