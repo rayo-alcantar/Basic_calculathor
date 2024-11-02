@@ -1,31 +1,17 @@
 ﻿# calc.py
 import wx
+import webbrowser
+import os
+import sys
+
 from operaciones import Aritmetica, Conversion, Trigonometria, CambioBases, Geometria
 import math
 import sympy as sp
-import wx.html2
-import os
-import sys
 
 
 
 VERSION = 0.2
 
-class DialogoDocumentacion(wx.Frame):
-	"""Ventana para mostrar la documentación."""
-	def __init__(self, parent):
-		super().__init__(parent, title="Documentación", size=(800, 600))
-		self.browser = wx.html2.WebView.New(self)
-		
-		# Cargar el archivo HTML desde el directorio adecuado
-		if getattr(sys, 'frozen', False):
-			# Si la aplicación está congelada con PyInstaller
-			ruta_base = sys._MEIPASS
-		else:
-			# Si se está ejecutando de forma normal
-			ruta_base = os.path.dirname(os.path.abspath(__file__))
-		ruta_html = os.path.join(ruta_base, 'documentacion.html')
-		self.browser.LoadURL(f'file://{ruta_html}')
 
 class Calculadora(wx.Frame):
 	"""Ventana principal de la calculadora."""
@@ -62,10 +48,17 @@ class Calculadora(wx.Frame):
 		self.SetMenuBar(menubar)
 
 	def abrir_documentacion(self, event):
-		"""Abre la documentación en una ventana dentro de la aplicación."""
-		dialogo = DialogoDocumentacion(self)
-		dialogo.Show()
-
+		"""Abre la documentación en el navegador web predeterminado."""
+		# Obtener la ruta completa al archivo documentacion.html
+		if getattr(sys, 'frozen', False):
+			# Si la aplicación está empaquetada con PyInstaller
+			ruta_base = sys._MEIPASS
+		else:
+			# Si se está ejecutando de forma normal
+			ruta_base = os.path.dirname(os.path.abspath(__file__))
+		ruta_html = os.path.join(ruta_base, 'documentacion.html')
+		# Abrir el archivo en el navegador web predeterminado
+		webbrowser.open(f'file://{ruta_html}')
 
 	def mostrar_acerca_de(self, event):
 		"""Muestra la información del desarrollador."""
