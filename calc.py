@@ -3,15 +3,14 @@ import wx
 import webbrowser
 import os
 import sys
+import requests
+import threading
 
 from operaciones import Aritmetica, Conversion, Trigonometria, CambioBases, Geometria
 import math
 import sympy as sp
 
-
-
-VERSION = 0.2
-
+VERSION = '0.3'
 
 class Calculadora(wx.Frame):
 	"""Ventana principal de la calculadora."""
@@ -37,6 +36,82 @@ class Calculadora(wx.Frame):
 		panel.SetSizer(vbox)
 		self.Centre()
 		self.Show()
+
+		# Comprobar actualizaciones al iniciar
+		self.comprobar_actualizaciones()
+
+	def comprobar_actualizaciones(self):
+		"""Comprueba si hay una nueva versión disponible en GitHub."""
+		def check_update():
+			try:
+				response = requests.get('https://api.github.com/repos/rayo-alcantar/Basic_calculathor/releases/latest')
+				if response.status_code == 200:
+					data = response.json()
+					ultima_version = data['tag_name'].lstrip('v')  # Obtener el número de versión sin la 'v'
+					if ultima_version != str(VERSION):
+						# Obtener la URL del primer asset de la release
+						assets = data.get('assets', [])
+						if assets:
+							url_asset = assets[0]['browser_download_url']
+							asset_name = assets[0]['name']
+							wx.CallAfter(self.notificar_nueva_version, ultima_version, url_asset, asset_name)
+						else:
+							print("No hay assets disponibles para descargar en la última release.")
+					else:
+						# Las versiones son iguales, no hace nada
+						pass
+				else:
+					print("No se pudo comprobar si hay actualizaciones.")
+			except Exception as e:
+				print(f"Error al comprobar actualizaciones: {e}")
+		threading.Thread(target=check_update).start()
+
+	def notificar_nueva_version(self, ultima_version, url_asset, asset_name):
+		"""Notifica al usuario que hay una nueva versión y ofrece descargarla."""
+		mensaje = (f"Hay una nueva versión disponible: {ultima_version}\n"
+				   "¿Desea descargarla ahora?")
+		dialogo = wx.MessageDialog(self, mensaje, "Actualización disponible", wx.YES_NO | wx.ICON_QUESTION)
+		respuesta = dialogo.ShowModal()
+		if respuesta == wx.ID_YES:
+			self.descargar_actualizacion(ultima_version, url_asset, asset_name)
+		dialogo.Destroy()
+
+	def descargar_actualizacion(self, ultima_version, url_asset, asset_name):
+		"""Descarga la actualización y guía al usuario para instalarla."""
+		def download():
+			try:
+				respuesta = requests.get(url_asset, stream=True)
+				if respuesta.status_code == 200:
+					# Guardar el archivo descargado con su nombre original
+					nombre_archivo = asset_name
+					with open(nombre_archivo, 'wb') as archivo:
+						for chunk in respuesta.iter_content(chunk_size=1024):
+							if chunk:
+								archivo.write(chunk)
+					wx.CallAfter(self.informar_descarga_exitosa, nombre_archivo)
+				else:
+					wx.CallAfter(self.mostrar_error_descarga, "No se pudo descargar la actualización.")
+			except Exception as e:
+				wx.CallAfter(self.mostrar_error_descarga, f"Error al descargar la actualización: {e}")
+		threading.Thread(target=download).start()
+
+	def informar_descarga_exitosa(self, nombre_archivo):
+		"""Informa al usuario que la descarga fue exitosa y cómo actualizar."""
+		mensaje = (f"La nueva versión se ha descargado como '{nombre_archivo}'.\n\n"
+				   "Para actualizar:\n"
+				   "1. Cierre la aplicación actual.\n"
+				   "2. Descomprima o ejecute el archivo descargado, según corresponda.\n"
+				   "3. Siga las instrucciones de instalación proporcionadas.\n\n"
+				   "Si está utilizando el ejecutable, reemplace el archivo '.exe' con el nuevo.")
+		wx.MessageBox(mensaje, "Descarga completada", wx.OK | wx.ICON_INFORMATION)
+	
+	def mostrar_error_descarga(self, mensaje_error):
+		"""Muestra un mensaje de error si la descarga falla."""
+		wx.MessageBox(mensaje_error, "Error de descarga", wx.OK | wx.ICON_ERROR)
+
+
+
+
 
 	def crear_menu(self):
 		"""Crea el menú de opciones."""
