@@ -1,6 +1,6 @@
 ﻿# Calculadora Básica
 
-¡Bienvenido a la **Calculadora Básica 0.2**! Este es un proyecto desarrollado como parte de un servicio social con el objetivo de proporcionar una herramienta accesible y útil para estudiantes, especialmente aquellos con discapacidad visual. La calculadora es completamente accesible con lectores de pantalla y está diseñada para ser sencilla y fácil de usar.
+¡Bienvenido a la **Calculadora Básica**! Este es un proyecto desarrollado como parte de un servicio social con el objetivo de proporcionar una herramienta accesible y útil para estudiantes, especialmente aquellos con discapacidad visual. La calculadora es completamente accesible con lectores de pantalla y está diseñada para ser sencilla y fácil de usar.
 
 ## Descripción
 
@@ -52,7 +52,7 @@ Si deseas distribuir la aplicación sin necesidad de que los usuarios tengan Pyt
 Ejecuta el siguiente comando en la terminal desde el directorio donde se encuentra `calc.py`:
 
 ```bash
-pyinstaller --windowed --onedir --name basic_calculathor0.2 calc.py --add-data "documentacion.html;."
+pyinstaller --windowed --onedir --name basic_calculathor0. calc.py --add-data "documentacion.html;."
 ```
 
 **Nota**: Este comando es para sistemas Windows. Si estás en macOS o Linux, reemplaza `;` por `:` en la opción `--add-data`:
