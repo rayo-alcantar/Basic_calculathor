@@ -3,8 +3,29 @@ import wx
 from operaciones import Aritmetica, Conversion, Trigonometria, CambioBases, Geometria
 import math
 import sympy as sp
+import wx.html2
+import os
+import sys
+
+
 
 VERSION = 0.2
+
+class DialogoDocumentacion(wx.Frame):
+	"""Ventana para mostrar la documentación."""
+	def __init__(self, parent):
+		super().__init__(parent, title="Documentación", size=(800, 600))
+		self.browser = wx.html2.WebView.New(self)
+		
+		# Cargar el archivo HTML desde el directorio adecuado
+		if getattr(sys, 'frozen', False):
+			# Si la aplicación está congelada con PyInstaller
+			ruta_base = sys._MEIPASS
+		else:
+			# Si se está ejecutando de forma normal
+			ruta_base = os.path.dirname(os.path.abspath(__file__))
+		ruta_html = os.path.join(ruta_base, 'documentacion.html')
+		self.browser.LoadURL(f'file://{ruta_html}')
 
 class Calculadora(wx.Frame):
 	"""Ventana principal de la calculadora."""
@@ -22,7 +43,11 @@ class Calculadora(wx.Frame):
 		btn_operaciones = wx.Button(panel, label="&Operaciones")
 		btn_operaciones.Bind(wx.EVT_BUTTON, self.mostrar_categorias)
 		vbox.Add(btn_operaciones, flag=wx.EXPAND|wx.ALL, border=10)
-
+		
+		btn_documentacion = wx.Button(panel, label="&Leer Documentación")
+		btn_documentacion.Bind(wx.EVT_BUTTON, self.abrir_documentacion)
+		vbox.Add(btn_documentacion, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.BOTTOM, border=10)
+		
 		panel.SetSizer(vbox)
 		self.Centre()
 		self.Show()
@@ -35,6 +60,12 @@ class Calculadora(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.mostrar_acerca_de, menu_acerca_de)
 		menubar.Append(menu_opciones, "&Opciones")
 		self.SetMenuBar(menubar)
+
+	def abrir_documentacion(self, event):
+		"""Abre la documentación en una ventana dentro de la aplicación."""
+		dialogo = DialogoDocumentacion(self)
+		dialogo.Show()
+
 
 	def mostrar_acerca_de(self, event):
 		"""Muestra la información del desarrollador."""
