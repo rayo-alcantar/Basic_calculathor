@@ -6,11 +6,12 @@ import sys
 import requests
 import threading
 
+from packaging import version  # Añadido para comparar versiones de forma adecuada
 from operaciones import Aritmetica, Conversion, Trigonometria, CambioBases, Geometria
 import math
 import sympy as sp
 
-VERSION = '0.3'
+VERSION = '0.3' 
 
 class Calculadora(wx.Frame):
 	"""Ventana principal de la calculadora."""
@@ -48,7 +49,9 @@ class Calculadora(wx.Frame):
 				if response.status_code == 200:
 					data = response.json()
 					ultima_version = data['tag_name'].lstrip('v')  # Obtener el número de versión sin la 'v'
-					if ultima_version != str(VERSION):
+					
+					# Comparar versiones utilizando packaging.version
+					if version.parse(ultima_version) > version.parse(VERSION):
 						# Obtener la URL del primer asset de la release
 						assets = data.get('assets', [])
 						if assets:
@@ -58,7 +61,7 @@ class Calculadora(wx.Frame):
 						else:
 							print("No hay assets disponibles para descargar en la última release.")
 					else:
-						# Las versiones son iguales, no hace nada
+						# La versión disponible no es más reciente
 						pass
 				else:
 					print("No se pudo comprobar si hay actualizaciones.")
@@ -108,10 +111,6 @@ class Calculadora(wx.Frame):
 	def mostrar_error_descarga(self, mensaje_error):
 		"""Muestra un mensaje de error si la descarga falla."""
 		wx.MessageBox(mensaje_error, "Error de descarga", wx.OK | wx.ICON_ERROR)
-
-
-
-
 
 	def crear_menu(self):
 		"""Crea el menú de opciones."""

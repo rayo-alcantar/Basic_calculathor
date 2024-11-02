@@ -58,7 +58,8 @@ pyinstaller --windowed --onedir --name basic_calculathor0. calc.py --add-data "d
 **Nota**: Este comando es para sistemas Windows. Si estás en macOS o Linux, reemplaza `;` por `:` en la opción `--add-data`:
 
 ```bash
-pyinstaller --windowed --onedir --name Calculadora0.2 calc.py --add-data "documentacion.html:."
+pyinstaller --windowed --onedir --name Calculadora0.3 calc.py --add-data "documentacion.html;." --hidden-import packaging
+
 ```
 
 ### Explicación del Comando
