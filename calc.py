@@ -10,7 +10,7 @@ import os
 import threading
 import math
 
-from operaciones import Aritmetica, Conversion, Trigonometria, CambioBases, Geometria, Quimica
+from operaciones import Aritmetica, Conversion, Trigonometria, CambioBases, Geometria, Quimica, Estadistica
 
 VERSION = '0.3' 
 
@@ -143,7 +143,7 @@ class Calculadora(wx.Frame):
 
 	def mostrar_categorias(self, event):
 		"""Muestra las categorías de operaciones disponibles."""
-		categorias = ['Aritmética', 'Conversión de Unidades', 'Trigonometría', 'Cambio de Bases', 'Geometría', 'Química']
+		categorias = ['Aritmética', 'Conversión de Unidades', 'Trigonometría', 'Cambio de Bases', 'Geometría', 'Química', 'estadística']
 		dlg = wx.SingleChoiceDialog(self, 'Seleccione una categoría:', 'Categorías', categorias)
 		if dlg.ShowModal() == wx.ID_OK:
 			seleccion = dlg.GetStringSelection()
@@ -159,6 +159,8 @@ class Calculadora(wx.Frame):
 				self.operaciones_geometricas()
 			elif seleccion == 'Química':
 				self.operaciones_quimica()
+			elif seleccion == 'estadística':
+				self.operaciones_estadistica()
 		dlg.Destroy()
 
 	def operaciones_aritmeticas(self):
@@ -237,6 +239,38 @@ class Calculadora(wx.Frame):
 	def realizar_operacion_quimica(self, operacion):
 		"""Inicia el diálogo para la operación química seleccionada."""
 		dialogo = DialogoQuimica(self, operacion)
+		dialogo.ShowModal()
+		dialogo.Destroy()
+
+	def operaciones_estadistica(self):
+		"""Despliega las operaciones estadísticas disponibles."""
+		operaciones = [
+			'Media',
+			'Mediana',
+			'Moda',
+			'Varianza',
+			'Desviación Estándar',
+			'Percentil',
+			'Cuartiles',
+			'Rango',
+			'Rango Intercuartil',
+			'Coeficiente de Asimetría',
+			'Curtosis',
+			'Covarianza',
+			'Coeficiente de Correlación',
+			'Regresión Lineal',
+			'Valor Z',
+			'Probabilidad Normal Estándar'
+		]
+		dlg = wx.SingleChoiceDialog(self, 'Seleccione una operación estadística:', 'Estadística', operaciones)
+		if dlg.ShowModal() == wx.ID_OK:
+			operacion = dlg.GetStringSelection()
+			self.realizar_operacion_estadistica(operacion)
+		dlg.Destroy()
+	
+	def realizar_operacion_estadistica(self, operacion):
+		"""Inicia el diálogo para la operación estadística seleccionada."""
+		dialogo = DialogoEstadistica(self, operacion)
 		dialogo.ShowModal()
 		dialogo.Destroy()
 
@@ -1025,6 +1059,185 @@ class DialogoQuimica(wx.Dialog):
 			return resultado
 		except Exception:
 			raise ValueError("Formato incorrecto. Use el formato clave=valor, separado por comas.")
+
+class DialogoEstadistica(wx.Dialog):
+	"""Diálogo para operaciones estadísticas."""
+	def __init__(self, parent, operacion):
+		super().__init__(parent, title=operacion, size=(500, 600))
+		self.operacion = operacion
+
+		vbox = wx.BoxSizer(wx.VERTICAL)
+
+		# Crear los controles de entrada según la operación seleccionada
+		if self.operacion in ['Media', 'Mediana', 'Moda', 'Varianza', 'Desviación Estándar', 'Cuartiles', 'Rango', 'Rango Intercuartil', 'Coeficiente de Asimetría', 'Curtosis']:
+			lbl_datos = wx.StaticText(self, label="Ingrese los datos separados por comas:")
+			self.txt_datos = wx.TextCtrl(self, style=wx.TE_MULTILINE)
+			vbox.Add(lbl_datos, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_datos, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+		elif self.operacion == 'Percentil':
+			lbl_datos = wx.StaticText(self, label="Ingrese los datos separados por comas:")
+			self.txt_datos = wx.TextCtrl(self, style=wx.TE_MULTILINE)
+			lbl_percentil = wx.StaticText(self, label="Ingrese el percentil (0-100):")
+			self.txt_percentil = wx.TextCtrl(self)
+			vbox.Add(lbl_datos, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_datos, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+			vbox.Add(lbl_percentil, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_percentil, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+		elif self.operacion in ['Covarianza', 'Coeficiente de Correlación', 'Regresión Lineal']:
+			lbl_datos_x = wx.StaticText(self, label="Ingrese los datos de X separados por comas:")
+			self.txt_datos_x = wx.TextCtrl(self, style=wx.TE_MULTILINE)
+			lbl_datos_y = wx.StaticText(self, label="Ingrese los datos de Y separados por comas:")
+			self.txt_datos_y = wx.TextCtrl(self, style=wx.TE_MULTILINE)
+			vbox.Add(lbl_datos_x, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_datos_x, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+			vbox.Add(lbl_datos_y, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_datos_y, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+		elif self.operacion == 'Valor Z':
+			lbl_x = wx.StaticText(self, label="Ingrese el valor X:")
+			self.txt_x = wx.TextCtrl(self)
+			lbl_media = wx.StaticText(self, label="Ingrese la media:")
+			self.txt_media = wx.TextCtrl(self)
+			lbl_desviacion = wx.StaticText(self, label="Ingrese la desviación estándar:")
+			self.txt_desviacion = wx.TextCtrl(self)
+			vbox.Add(lbl_x, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_x, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+			vbox.Add(lbl_media, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_media, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+			vbox.Add(lbl_desviacion, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_desviacion, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+		elif self.operacion == 'Probabilidad Normal Estándar':
+			lbl_z = wx.StaticText(self, label="Ingrese el valor Z:")
+			self.txt_z = wx.TextCtrl(self)
+			vbox.Add(lbl_z, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_z, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+		else:
+			mensaje = "Operación no soportada."
+			wx.MessageBox(mensaje, "Error", wx.OK | wx.ICON_ERROR)
+			self.Destroy()
+			return
+
+		# Campo para mostrar el resultado
+		lbl_resultado = wx.StaticText(self, label="Resultado:")
+		self.txt_resultado = wx.TextCtrl(self, style=wx.TE_READONLY | wx.TE_MULTILINE)
+		vbox.Add(lbl_resultado, flag=wx.LEFT | wx.TOP, border=10)
+		vbox.Add(self.txt_resultado, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, border=10)
+
+		# Botones de acción
+		hbox = wx.BoxSizer(wx.HORIZONTAL)
+		btn_calcular = wx.Button(self, label="&Calcular")
+		btn_calcular.Bind(wx.EVT_BUTTON, self.calcular)
+		btn_ayuda = wx.Button(self, label="&Ayuda")
+		btn_ayuda.Bind(wx.EVT_BUTTON, self.mostrar_ayuda)
+		btn_salir = wx.Button(self, label="&Salir")
+		btn_salir.Bind(wx.EVT_BUTTON, self.salir)
+		hbox.Add(btn_calcular, flag=wx.RIGHT, border=5)
+		hbox.Add(btn_ayuda, flag=wx.RIGHT, border=5)
+		hbox.Add(btn_salir)
+
+		vbox.Add(hbox, flag=wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=10)
+
+		self.SetSizer(vbox)
+
+	def calcular(self, event):
+		"""Realiza el cálculo de la operación estadística seleccionada."""
+		try:
+			if self.operacion in ['Media', 'Mediana', 'Moda', 'Varianza', 'Desviación Estándar', 'Cuartiles', 'Rango', 'Rango Intercuartil', 'Coeficiente de Asimetría', 'Curtosis']:
+				datos_str = self.txt_datos.GetValue()
+				lista_datos = self.parsear_lista(datos_str)
+				if self.operacion == 'Media':
+					resultado = Estadistica.media(lista_datos)
+				elif self.operacion == 'Mediana':
+					resultado = Estadistica.mediana(lista_datos)
+				elif self.operacion == 'Moda':
+					resultado = Estadistica.moda(lista_datos)
+				elif self.operacion == 'Varianza':
+					resultado = Estadistica.varianza(lista_datos)
+				elif self.operacion == 'Desviación Estándar':
+					resultado = Estadistica.desviacion_estandar(lista_datos)
+				elif self.operacion == 'Cuartiles':
+					Q1, Q2, Q3 = Estadistica.cuartiles(lista_datos)
+					resultado = f"Q1 = {Q1}\nQ2 (Mediana) = {Q2}\nQ3 = {Q3}"
+				elif self.operacion == 'Rango':
+					resultado = Estadistica.rango(lista_datos)
+				elif self.operacion == 'Rango Intercuartil':
+					resultado = Estadistica.rango_intercuartil(lista_datos)
+				elif self.operacion == 'Coeficiente de Asimetría':
+					resultado = Estadistica.coeficiente_asimetria(lista_datos)
+				elif self.operacion == 'Curtosis':
+					resultado = Estadistica.curtosis(lista_datos)
+				self.txt_resultado.SetValue(str(resultado))
+				self.txt_datos.SetValue("")
+			elif self.operacion == 'Percentil':
+				datos_str = self.txt_datos.GetValue()
+				lista_datos = self.parsear_lista(datos_str)
+				percentil = float(self.txt_percentil.GetValue())
+				resultado = Estadistica.percentil(lista_datos, percentil)
+				self.txt_resultado.SetValue(f"Percentil {percentil} = {resultado}")
+				self.txt_datos.SetValue("")
+				self.txt_percentil.SetValue("")
+			elif self.operacion in ['Covarianza', 'Coeficiente de Correlación', 'Regresión Lineal']:
+				datos_x_str = self.txt_datos_x.GetValue()
+				datos_y_str = self.txt_datos_y.GetValue()
+				lista_x = self.parsear_lista(datos_x_str)
+				lista_y = self.parsear_lista(datos_y_str)
+				if self.operacion == 'Covarianza':
+					resultado = Estadistica.covarianza(lista_x, lista_y)
+				elif self.operacion == 'Coeficiente de Correlación':
+					resultado = Estadistica.coeficiente_correlacion(lista_x, lista_y)
+				elif self.operacion == 'Regresión Lineal':
+					pendiente, intercepto = Estadistica.regresion_lineal(lista_x, lista_y)
+					resultado = f"Pendiente (m) = {pendiente}\nIntercepto (b) = {intercepto}"
+				self.txt_resultado.SetValue(str(resultado))
+				self.txt_datos_x.SetValue("")
+				self.txt_datos_y.SetValue("")
+			elif self.operacion == 'Valor Z':
+				x = float(self.txt_x.GetValue())
+				media = float(self.txt_media.GetValue())
+				desviacion = float(self.txt_desviacion.GetValue())
+				resultado = Estadistica.valor_z(x, media, desviacion)
+				self.txt_resultado.SetValue(f"Valor Z = {resultado}")
+				self.txt_x.SetValue("")
+				self.txt_media.SetValue("")
+				self.txt_desviacion.SetValue("")
+			elif self.operacion == 'Probabilidad Normal Estándar':
+				z = float(self.txt_z.GetValue())
+				resultado = Estadistica.probabilidad_normal_estandar(z)
+				self.txt_resultado.SetValue(f"Probabilidad acumulada hasta Z = {z} es {resultado}")
+				self.txt_z.SetValue("")
+			else:
+				raise ValueError("Operación no soportada.")
+
+			self.txt_resultado.SetFocus()
+
+		except Exception as e:
+			wx.MessageBox(f"Error: {e}", "Error", wx.OK | wx.ICON_ERROR)
+
+	def parsear_lista(self, cadena):
+		"""Convierte una cadena de texto en una lista de números."""
+		try:
+			return [float(item.strip()) for item in cadena.strip().split(',') if item.strip()]
+		except Exception:
+			raise ValueError("Formato incorrecto. Ingrese los datos separados por comas.")
+
+	def mostrar_ayuda(self, event):
+		"""Muestra la ayuda específica para la operación estadística seleccionada."""
+		if self.operacion in ['Media', 'Mediana', 'Moda', 'Varianza', 'Desviación Estándar', 'Cuartiles', 'Rango', 'Rango Intercuartil', 'Coeficiente de Asimetría', 'Curtosis']:
+			mensaje = "Ingrese una lista de números separados por comas para calcular la operación seleccionada."
+		elif self.operacion == 'Percentil':
+			mensaje = "Ingrese una lista de números separados por comas y el percentil que desea calcular (entre 0 y 100)."
+		elif self.operacion in ['Covarianza', 'Coeficiente de Correlación', 'Regresión Lineal']:
+			mensaje = "Ingrese dos listas de números separados por comas para X e Y, respectivamente."
+		elif self.operacion == 'Valor Z':
+			mensaje = "Ingrese el valor X, la media y la desviación estándar para calcular el valor Z."
+		elif self.operacion == 'Probabilidad Normal Estándar':
+			mensaje = "Ingrese el valor Z para calcular la probabilidad acumulada hasta ese punto en la distribución normal estándar."
+		else:
+			mensaje = "Operación no soportada."
+		wx.MessageBox(mensaje, "Ayuda", wx.OK | wx.ICON_INFORMATION)
+
+	def salir(self, event):
+		"""Cierra el diálogo actual."""
+		self.Destroy()
 
 
 if __name__ == '__main__':

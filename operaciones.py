@@ -1,6 +1,9 @@
 ﻿# operaciones.py
 import math
 import sympy as sp
+from collections import Counter
+
+
 
 class Aritmetica:
 	"""Clase para operaciones aritméticas básicas."""
@@ -438,3 +441,177 @@ class Quimica:
 		if rendimiento_teorico == 0:
 			raise ValueError("El rendimiento teórico no puede ser cero.")
 		return (rendimiento_real / rendimiento_teorico) * 100
+
+
+class Estadistica:
+	"""Clase para operaciones estadísticas básicas y avanzadas."""
+
+	@staticmethod
+	def media(lista):
+		"""Calcula la media aritmética de una lista de números."""
+		if not lista:
+			raise ValueError("La lista no puede estar vacía.")
+		return sum(lista) / len(lista)
+
+	@staticmethod
+	def mediana(lista):
+		"""Calcula la mediana de una lista de números."""
+		if not lista:
+			raise ValueError("La lista no puede estar vacía.")
+		n = len(lista)
+		lista_ordenada = sorted(lista)
+		mitad = n // 2
+		if n % 2 == 0:
+			mediana = (lista_ordenada[mitad - 1] + lista_ordenada[mitad]) / 2.0
+		else:
+			mediana = lista_ordenada[mitad]
+		return mediana
+
+	@staticmethod
+	def moda(lista):
+		"""Calcula la moda de una lista de números."""
+		if not lista:
+			raise ValueError("La lista no puede estar vacía.")
+		frecuencias = Counter(lista)
+		max_freq = max(frecuencias.values())
+		modas = [key for key, freq in frecuencias.items() if freq == max_freq]
+		return modas
+
+	@staticmethod
+	def varianza(lista, poblacional=False):
+		"""Calcula la varianza de una lista de números."""
+		if not lista:
+			raise ValueError("La lista no puede estar vacía.")
+		n = len(lista)
+		if n < 2 and not poblacional:
+			raise ValueError("La varianza muestral requiere al menos dos datos.")
+		media = Estadistica.media(lista)
+		suma_cuadrados = sum((x - media) ** 2 for x in lista)
+		if poblacional:
+			return suma_cuadrados / n
+		else:
+			return suma_cuadrados / (n - 1)
+
+	@staticmethod
+	def desviacion_estandar(lista, poblacional=False):
+		"""Calcula la desviación estándar de una lista de números."""
+		varianza = Estadistica.varianza(lista, poblacional)
+		return math.sqrt(varianza)
+
+	@staticmethod
+	def percentil(lista, percentil):
+		"""Calcula el percentil de una lista de números."""
+		if not lista:
+			raise ValueError("La lista no puede estar vacía.")
+		if not 0 <= percentil <= 100:
+			raise ValueError("El percentil debe estar entre 0 y 100.")
+		lista_ordenada = sorted(lista)
+		k = (len(lista) - 1) * (percentil / 100.0)
+		f = math.floor(k)
+		c = math.ceil(k)
+		if f == c:
+			return lista_ordenada[int(k)]
+		d0 = lista_ordenada[int(f)] * (c - k)
+		d1 = lista_ordenada[int(c)] * (k - f)
+		return d0 + d1
+
+	@staticmethod
+	def cuartiles(lista):
+		"""Calcula los cuartiles de una lista de números."""
+		Q1 = Estadistica.percentil(lista, 25)
+		Q2 = Estadistica.percentil(lista, 50)  # Mediana
+		Q3 = Estadistica.percentil(lista, 75)
+		return (Q1, Q2, Q3)
+
+	@staticmethod
+	def rango(lista):
+		"""Calcula el rango de una lista de números."""
+		if not lista:
+			raise ValueError("La lista no puede estar vacía.")
+		return max(lista) - min(lista)
+
+	@staticmethod
+	def rango_intercuartil(lista):
+		"""Calcula el rango intercuartil (IQR) de una lista de números."""
+		Q1, _, Q3 = Estadistica.cuartiles(lista)
+		return Q3 - Q1
+
+	@staticmethod
+	def coeficiente_asimetria(lista):
+		"""Calcula el coeficiente de asimetría (skewness) de una lista de números."""
+		if not lista:
+			raise ValueError("La lista no puede estar vacía.")
+		n = len(lista)
+		if n < 3:
+			raise ValueError("Se requieren al menos tres datos para calcular el coeficiente de asimetría.")
+		media = Estadistica.media(lista)
+		desviacion = Estadistica.desviacion_estandar(lista, poblacional=True)
+		suma_cubos = sum((x - media) ** 3 for x in lista)
+		skewness = (n / ((n - 1) * (n - 2))) * (suma_cubos / (desviacion ** 3))
+		return skewness
+
+	@staticmethod
+	def curtosis(lista):
+		"""Calcula la curtosis (kurtosis) de una lista de números."""
+		if not lista:
+			raise ValueError("La lista no puede estar vacía.")
+		n = len(lista)
+		if n < 4:
+			raise ValueError("Se requieren al menos cuatro datos para calcular la curtosis.")
+		media = Estadistica.media(lista)
+		desviacion = Estadistica.desviacion_estandar(lista, poblacional=True)
+		suma_cuartos = sum((x - media) ** 4 for x in lista)
+		kurtosis = ((n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))) * (suma_cuartos / (desviacion ** 4))
+		kurtosis -= (3 * (n - 1) ** 2) / ((n - 2) * (n - 3))
+		return kurtosis
+
+	@staticmethod
+	def covarianza(lista_x, lista_y):
+		"""Calcula la covarianza entre dos listas de números."""
+		if not lista_x or not lista_y:
+			raise ValueError("Las listas no pueden estar vacías.")
+		if len(lista_x) != len(lista_y):
+			raise ValueError("Las listas deben tener la misma longitud.")
+		n = len(lista_x)
+		media_x = Estadistica.media(lista_x)
+		media_y = Estadistica.media(lista_y)
+		suma_producto = sum((x - media_x) * (y - media_y) for x, y in zip(lista_x, lista_y))
+		return suma_producto / (n - 1)
+
+	@staticmethod
+	def coeficiente_correlacion(lista_x, lista_y):
+		"""Calcula el coeficiente de correlación de Pearson entre dos listas de números."""
+		cov = Estadistica.covarianza(lista_x, lista_y)
+		desviacion_x = Estadistica.desviacion_estandar(lista_x)
+		desviacion_y = Estadistica.desviacion_estandar(lista_y)
+		if desviacion_x == 0 or desviacion_y == 0:
+			raise ValueError("La desviación estándar no puede ser cero.")
+		return cov / (desviacion_x * desviacion_y)
+
+	@staticmethod
+	def regresion_lineal(lista_x, lista_y):
+		"""Calcula los coeficientes de la regresión lineal (pendiente y ordenada al origen)."""
+		if not lista_x or not lista_y:
+			raise ValueError("Las listas no pueden estar vacías.")
+		if len(lista_x) != len(lista_y):
+			raise ValueError("Las listas deben tener la misma longitud.")
+		n = len(lista_x)
+		media_x = Estadistica.media(lista_x)
+		media_y = Estadistica.media(lista_y)
+		sum_xy = sum(x * y for x, y in zip(lista_x, lista_y))
+		sum_xx = sum(x ** 2 for x in lista_x)
+		pendiente = (sum_xy - n * media_x * media_y) / (sum_xx - n * media_x ** 2)
+		intercepto = media_y - pendiente * media_x
+		return pendiente, intercepto
+
+	@staticmethod
+	def valor_z(x, media, desviacion_estandar):
+		"""Calcula el valor Z (estandarización) de un valor X."""
+		if desviacion_estandar == 0:
+			raise ValueError("La desviación estándar no puede ser cero.")
+		return (x - media) / desviacion_estandar
+
+	@staticmethod
+	def probabilidad_normal_estandar(z):
+		"""Calcula la probabilidad acumulada hasta un valor Z en la distribución normal estándar."""
+		return 0.5 * (1 + math.erf(z / math.sqrt(2)))
