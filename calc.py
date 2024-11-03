@@ -10,7 +10,7 @@ import os
 import threading
 import math
 
-from operaciones import Aritmetica, Conversion, Trigonometria, CambioBases, Geometria
+from operaciones import Aritmetica, Conversion, Trigonometria, CambioBases, Geometria, Quimica
 
 VERSION = '0.3' 
 
@@ -143,7 +143,7 @@ class Calculadora(wx.Frame):
 
 	def mostrar_categorias(self, event):
 		"""Muestra las categorías de operaciones disponibles."""
-		categorias = ['Aritmética', 'Conversión de Unidades', 'Trigonometría', 'Cambio de Bases', 'Geometría']
+		categorias = ['Aritmética', 'Conversión de Unidades', 'Trigonometría', 'Cambio de Bases', 'Geometría', 'Química']
 		dlg = wx.SingleChoiceDialog(self, 'Seleccione una categoría:', 'Categorías', categorias)
 		if dlg.ShowModal() == wx.ID_OK:
 			seleccion = dlg.GetStringSelection()
@@ -157,6 +157,8 @@ class Calculadora(wx.Frame):
 				self.cambio_bases()
 			elif seleccion == 'Geometría':
 				self.operaciones_geometricas()
+			elif seleccion == 'Química':
+				self.operaciones_quimica()
 		dlg.Destroy()
 
 	def operaciones_aritmeticas(self):
@@ -212,6 +214,31 @@ class Calculadora(wx.Frame):
 			dialogo.ShowModal()
 			dialogo.Destroy()
 		dlg.Destroy()
+
+	def operaciones_quimica(self):
+		"""Despliega las operaciones químicas disponibles."""
+		operaciones = [
+			'Calcular Masa Molar',
+			'Convertir Masa a Moles',
+			'Calcular Número de Partículas',
+			'Energía de Enlace',
+			'Calcular Concentración Molar',
+			'Calcular pH',
+			'Ley de Gases Ideales',
+			'Calcular Constante de Equilibrio',
+			'Calcular Rendimiento Porcentual'
+		]
+		dlg = wx.SingleChoiceDialog(self, 'Seleccione una operación química:', 'Química', operaciones)
+		if dlg.ShowModal() == wx.ID_OK:
+			operacion = dlg.GetStringSelection()
+			self.realizar_operacion_quimica(operacion)
+		dlg.Destroy()
+
+	def realizar_operacion_quimica(self, operacion):
+		"""Inicia el diálogo para la operación química seleccionada."""
+		dialogo = DialogoQuimica(self, operacion)
+		dialogo.ShowModal()
+		dialogo.Destroy()
 
 class DialogoAritmetica(wx.Dialog):
 	"""Diálogo para operaciones aritméticas."""
@@ -701,6 +728,89 @@ class DialogoGeometria(wx.Dialog):
 	def salir(self, event):
 		"""Cierra el diálogo actual."""
 		self.Destroy()
+
+class DialogoQuimica(wx.Dialog):
+	"""Diálogo para operaciones químicas."""
+	def __init__(self, parent, operacion):
+		super().__init__(parent, title=operacion, size=(400, 400))
+		self.operacion = operacion
+
+		vbox = wx.BoxSizer(wx.VERTICAL)
+
+		# Crear los controles de entrada según la operación seleccionada
+		if self.operacion == 'Calcular Masa Molar':
+			lbl_compuesto = wx.StaticText(self, label="Ingrese la fórmula química del compuesto:")
+			self.txt_compuesto = wx.TextCtrl(self)
+			vbox.Add(lbl_compuesto, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_compuesto, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+		elif self.operacion == 'Convertir Masa a Moles':
+			lbl_masa = wx.StaticText(self, label="Ingrese la masa en gramos:")
+			self.txt_masa = wx.TextCtrl(self)
+			lbl_masa_molar = wx.StaticText(self, label="Ingrese la masa molar (g/mol):")
+			self.txt_masa_molar = wx.TextCtrl(self)
+			vbox.Add(lbl_masa, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_masa, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+			vbox.Add(lbl_masa_molar, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_masa_molar, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+		# Añade más bloques 'elif' para cada operación química
+
+		# Campo para mostrar el resultado
+		lbl_resultado = wx.StaticText(self, label="Resultado:")
+		self.txt_resultado = wx.TextCtrl(self, style=wx.TE_READONLY)
+		vbox.Add(lbl_resultado, flag=wx.LEFT | wx.TOP, border=10)
+		vbox.Add(self.txt_resultado, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+		# Botones de acción
+		hbox = wx.BoxSizer(wx.HORIZONTAL)
+		btn_calcular = wx.Button(self, label="&Calcular")
+		btn_calcular.Bind(wx.EVT_BUTTON, self.calcular)
+		btn_ayuda = wx.Button(self, label="&Ayuda")
+		btn_ayuda.Bind(wx.EVT_BUTTON, self.mostrar_ayuda)
+		btn_salir = wx.Button(self, label="&Salir")
+		btn_salir.Bind(wx.EVT_BUTTON, self.salir)
+		hbox.Add(btn_calcular, flag=wx.RIGHT, border=5)
+		hbox.Add(btn_ayuda, flag=wx.RIGHT, border=5)
+		hbox.Add(btn_salir)
+
+		vbox.Add(hbox, flag=wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=10)
+
+		self.SetSizer(vbox)
+
+	def calcular(self, event):
+		"""Realiza el cálculo de la operación química seleccionada."""
+		try:
+			if self.operacion == 'Calcular Masa Molar':
+				compuesto = self.txt_compuesto.GetValue()
+				resultado = Quimica.calcular_masa_molar(compuesto)
+				self.txt_resultado.SetValue(f"{resultado} g/mol")
+				self.txt_compuesto.SetValue("")
+			elif self.operacion == 'Convertir Masa a Moles':
+				masa = float(self.txt_masa.GetValue())
+				masa_molar = float(self.txt_masa_molar.GetValue())
+				resultado = Quimica.convertir_masa_a_moles(masa, masa_molar)
+				self.txt_resultado.SetValue(f"{resultado} moles")
+				self.txt_masa.SetValue("")
+				self.txt_masa_molar.SetValue("")
+			# Implementa los cálculos para las demás operaciones químicas
+			self.txt_resultado.SetFocus()
+		except Exception as e:
+			wx.MessageBox(f"Error: {e}", "Error", wx.OK | wx.ICON_ERROR)
+
+	def mostrar_ayuda(self, event):
+		"""Muestra la ayuda específica para la operación química seleccionada."""
+		if self.operacion == 'Calcular Masa Molar':
+			mensaje = "Ingrese la fórmula química del compuesto. Ejemplo: H2O, C6H12O6."
+		elif self.operacion == 'Convertir Masa a Moles':
+			mensaje = "Ingrese la masa en gramos y la masa molar del compuesto en g/mol."
+		# Añade mensajes de ayuda para las demás operaciones
+		else:
+			mensaje = "Operación no soportada."
+		wx.MessageBox(mensaje, "Ayuda", wx.OK | wx.ICON_INFORMATION)
+
+	def salir(self, event):
+		"""Cierra el diálogo actual."""
+		self.Destroy()
+
 
 if __name__ == '__main__':
 	app = wx.App()
