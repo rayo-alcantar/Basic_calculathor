@@ -12,7 +12,7 @@ import math
 
 from operaciones import Aritmetica, Conversion, Trigonometria, CambioBases, Geometria, Quimica, Estadistica
 
-VERSION = '0.3' 
+VERSION = '0.4' 
 
 class Calculadora(wx.Frame):
 	"""Ventana principal de la calculadora."""
