@@ -1,15 +1,16 @@
 ﻿# calc.py
 import wx
 import webbrowser
-import os
 import sys
 import requests
-import threading
-
-from packaging import version  # Añadido para comparar versiones de forma adecuada
-from operaciones import Aritmetica, Conversion, Trigonometria, CambioBases, Geometria
-import math
 import sympy as sp
+from packaging import version
+
+import os
+import threading
+import math
+
+from operaciones import Aritmetica, Conversion, Trigonometria, CambioBases, Geometria
 
 VERSION = '0.3' 
 
@@ -105,7 +106,7 @@ class Calculadora(wx.Frame):
 				   "1. Cierre la aplicación actual.\n"
 				   "2. Descomprima o ejecute el archivo descargado, según corresponda.\n"
 				   "3. Siga las instrucciones de instalación proporcionadas.\n\n"
-				   "Si está utilizando el ejecutable, reemplace el archivo '.exe' con el nuevo.")
+				   "Si está utilizando el ejecutable, extraiga el archivo y reemplace el archivo '.exe' con el nuevo.")
 		wx.MessageBox(mensaje, "Descarga completada", wx.OK | wx.ICON_INFORMATION)
 	
 	def mostrar_error_descarga(self, mensaje_error):
