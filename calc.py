@@ -732,7 +732,7 @@ class DialogoGeometria(wx.Dialog):
 class DialogoQuimica(wx.Dialog):
 	"""Diálogo para operaciones químicas."""
 	def __init__(self, parent, operacion):
-		super().__init__(parent, title=operacion, size=(400, 400))
+		super().__init__(parent, title=operacion, size=(450, 500))
 		self.operacion = operacion
 
 		vbox = wx.BoxSizer(wx.VERTICAL)
@@ -743,6 +743,7 @@ class DialogoQuimica(wx.Dialog):
 			self.txt_compuesto = wx.TextCtrl(self)
 			vbox.Add(lbl_compuesto, flag=wx.LEFT | wx.TOP, border=10)
 			vbox.Add(self.txt_compuesto, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
 		elif self.operacion == 'Convertir Masa a Moles':
 			lbl_masa = wx.StaticText(self, label="Ingrese la masa en gramos:")
 			self.txt_masa = wx.TextCtrl(self)
@@ -752,7 +753,88 @@ class DialogoQuimica(wx.Dialog):
 			vbox.Add(self.txt_masa, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
 			vbox.Add(lbl_masa_molar, flag=wx.LEFT | wx.TOP, border=10)
 			vbox.Add(self.txt_masa_molar, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
-		# Añade más bloques 'elif' para cada operación química
+
+		elif self.operacion == 'Calcular Número de Partículas':
+			lbl_moles = wx.StaticText(self, label="Ingrese la cantidad de moles:")
+			self.txt_moles = wx.TextCtrl(self)
+			vbox.Add(lbl_moles, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_moles, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+		elif self.operacion == 'Calcular Concentración Molar':
+			lbl_moles = wx.StaticText(self, label="Ingrese el número de moles del soluto:")
+			self.txt_moles = wx.TextCtrl(self)
+			lbl_volumen = wx.StaticText(self, label="Ingrese el volumen de la solución en litros:")
+			self.txt_volumen = wx.TextCtrl(self)
+			vbox.Add(lbl_moles, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_moles, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+			vbox.Add(lbl_volumen, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_volumen, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+		elif self.operacion == 'Calcular pH':
+			lbl_concentracion = wx.StaticText(self, label="Ingrese la concentración de H+ (mol/L):")
+			self.txt_concentracion = wx.TextCtrl(self)
+			vbox.Add(lbl_concentracion, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_concentracion, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+		elif self.operacion == 'Calcular Rendimiento Porcentual':
+			lbl_real = wx.StaticText(self, label="Ingrese el rendimiento real (g):")
+			self.txt_real = wx.TextCtrl(self)
+			lbl_teorico = wx.StaticText(self, label="Ingrese el rendimiento teórico (g):")
+			self.txt_teorico = wx.TextCtrl(self)
+			vbox.Add(lbl_real, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_real, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+			vbox.Add(lbl_teorico, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_teorico, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+		elif self.operacion == 'Ley de Gases Ideales':
+			lbl_desconocida = wx.StaticText(self, label="Seleccione la variable a calcular:")
+			self.cmb_desconocida = wx.ComboBox(self, choices=['Presión (P)', 'Volumen (V)', 'Número de moles (n)', 'Temperatura (T)'], style=wx.CB_READONLY)
+			vbox.Add(lbl_desconocida, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.cmb_desconocida, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+			lbl_presion = wx.StaticText(self, label="Ingrese la presión (atm):")
+			self.txt_presion = wx.TextCtrl(self)
+			lbl_volumen = wx.StaticText(self, label="Ingrese el volumen (L):")
+			self.txt_volumen = wx.TextCtrl(self)
+			lbl_moles = wx.StaticText(self, label="Ingrese el número de moles (mol):")
+			self.txt_moles = wx.TextCtrl(self)
+			lbl_temperatura = wx.StaticText(self, label="Ingrese la temperatura (K):")
+			self.txt_temperatura = wx.TextCtrl(self)
+
+			vbox.Add(lbl_presion, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_presion, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+			vbox.Add(lbl_volumen, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_volumen, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+			vbox.Add(lbl_moles, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_moles, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+			vbox.Add(lbl_temperatura, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_temperatura, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+		elif self.operacion == 'Calcular Constante de Equilibrio':
+			lbl_productos = wx.StaticText(self, label="Ingrese las concentraciones de productos (ejemplo: H2=0.5, O2=0.2):")
+			self.txt_productos = wx.TextCtrl(self)
+			lbl_reactivos = wx.StaticText(self, label="Ingrese las concentraciones de reactivos (ejemplo: H2O=1.0):")
+			self.txt_reactivos = wx.TextCtrl(self)
+			vbox.Add(lbl_productos, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_productos, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+			vbox.Add(lbl_reactivos, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_reactivos, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+		elif self.operacion == 'Energía de Enlace':
+			lbl_enlaces = wx.StaticText(self, label="Ingrese los enlaces y cantidades (ejemplo: C-H=4, C=C=1):")
+			self.txt_enlaces = wx.TextCtrl(self)
+			lbl_energias = wx.StaticText(self, label="Ingrese las energías de enlace (ejemplo: C-H=413, C=C=614):")
+			self.txt_energias = wx.TextCtrl(self)
+			vbox.Add(lbl_enlaces, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_enlaces, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+			vbox.Add(lbl_energias, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_energias, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+		else:
+			mensaje = "Operación no soportada."
+			wx.MessageBox(mensaje, "Error", wx.OK | wx.ICON_ERROR)
+			self.Destroy()
+			return
 
 		# Campo para mostrar el resultado
 		lbl_resultado = wx.StaticText(self, label="Resultado:")
@@ -782,17 +864,100 @@ class DialogoQuimica(wx.Dialog):
 			if self.operacion == 'Calcular Masa Molar':
 				compuesto = self.txt_compuesto.GetValue()
 				resultado = Quimica.calcular_masa_molar(compuesto)
-				self.txt_resultado.SetValue(f"{resultado} g/mol")
+				self.txt_resultado.SetValue(f"{resultado:.3f} g/mol")
 				self.txt_compuesto.SetValue("")
+
 			elif self.operacion == 'Convertir Masa a Moles':
 				masa = float(self.txt_masa.GetValue())
 				masa_molar = float(self.txt_masa_molar.GetValue())
 				resultado = Quimica.convertir_masa_a_moles(masa, masa_molar)
-				self.txt_resultado.SetValue(f"{resultado} moles")
+				self.txt_resultado.SetValue(f"{resultado:.5f} moles")
 				self.txt_masa.SetValue("")
 				self.txt_masa_molar.SetValue("")
-			# Implementa los cálculos para las demás operaciones químicas
+
+			elif self.operacion == 'Calcular Número de Partículas':
+				moles = float(self.txt_moles.GetValue())
+				resultado = Quimica.calcular_numero_particulas(moles)
+				self.txt_resultado.SetValue(f"{resultado:.3e} partículas")
+				self.txt_moles.SetValue("")
+
+			elif self.operacion == 'Calcular Concentración Molar':
+				n_moles = float(self.txt_moles.GetValue())
+				volumen = float(self.txt_volumen.GetValue())
+				resultado = Quimica.calcular_concentracion_molar(n_moles, volumen)
+				self.txt_resultado.SetValue(f"{resultado:.5f} mol/L")
+				self.txt_moles.SetValue("")
+				self.txt_volumen.SetValue("")
+
+			elif self.operacion == 'Calcular pH':
+				concentracion = float(self.txt_concentracion.GetValue())
+				resultado = Quimica.calcular_pH(concentracion)
+				self.txt_resultado.SetValue(f"pH = {resultado:.2f}")
+				self.txt_concentracion.SetValue("")
+
+			elif self.operacion == 'Calcular Rendimiento Porcentual':
+				rendimiento_real = float(self.txt_real.GetValue())
+				rendimiento_teorico = float(self.txt_teorico.GetValue())
+				resultado = Quimica.calcular_rendimiento_porcentual(rendimiento_real, rendimiento_teorico)
+				self.txt_resultado.SetValue(f"Rendimiento: {resultado:.2f}%")
+				self.txt_real.SetValue("")
+				self.txt_teorico.SetValue("")
+
+			elif self.operacion == 'Ley de Gases Ideales':
+				desconocida = self.cmb_desconocida.GetValue()
+				P = float(self.txt_presion.GetValue()) if self.txt_presion.GetValue() else None
+				V = float(self.txt_volumen.GetValue()) if self.txt_volumen.GetValue() else None
+				n = float(self.txt_moles.GetValue()) if self.txt_moles.GetValue() else None
+				T = float(self.txt_temperatura.GetValue()) if self.txt_temperatura.GetValue() else None
+
+				variables = {'P': P, 'V': V, 'n': n, 'T': T}
+
+				# Establecer la variable desconocida a None
+				if 'Presión' in desconocida:
+					variables['P'] = None
+				elif 'Volumen' in desconocida:
+					variables['V'] = None
+				elif 'Número de moles' in desconocida:
+					variables['n'] = None
+				elif 'Temperatura' in desconocida:
+					variables['T'] = None
+				else:
+					raise ValueError("Variable desconocida no reconocida.")
+
+				resultado = Quimica.ley_gases_ideales(P=variables['P'], V=variables['V'], n=variables['n'], T=variables['T'])
+				variable_calculada = desconocida.split(' ')[0]
+				self.txt_resultado.SetValue(f"{variable_calculada} = {resultado:.5f}")
+				# Limpiar campos
+				self.txt_presion.SetValue("")
+				self.txt_volumen.SetValue("")
+				self.txt_moles.SetValue("")
+				self.txt_temperatura.SetValue("")
+
+			elif self.operacion == 'Calcular Constante de Equilibrio':
+				productos_str = self.txt_productos.GetValue()
+				reactivos_str = self.txt_reactivos.GetValue()
+				productos = self.parsear_concentraciones(productos_str)
+				reactivos = self.parsear_concentraciones(reactivos_str)
+				resultado = Quimica.calcular_constante_equilibrio(productos, reactivos)
+				self.txt_resultado.SetValue(f"Kc = {resultado:.5f}")
+				self.txt_productos.SetValue("")
+				self.txt_reactivos.SetValue("")
+
+			elif self.operacion == 'Energía de Enlace':
+				enlaces_str = self.txt_enlaces.GetValue()
+				energias_str = self.txt_energias.GetValue()
+				enlaces = self.parsear_diccionario(enlaces_str)
+				energias_enlace = self.parsear_diccionario(energias_str)
+				resultado = Quimica.energia_enlace(enlaces, energias_enlace)
+				self.txt_resultado.SetValue(f"Energía total: {resultado:.2f} kJ/mol")
+				self.txt_enlaces.SetValue("")
+				self.txt_energias.SetValue("")
+
+			else:
+				raise ValueError("Operación no soportada.")
+
 			self.txt_resultado.SetFocus()
+
 		except Exception as e:
 			wx.MessageBox(f"Error: {e}", "Error", wx.OK | wx.ICON_ERROR)
 
@@ -802,7 +967,33 @@ class DialogoQuimica(wx.Dialog):
 			mensaje = "Ingrese la fórmula química del compuesto. Ejemplo: H2O, C6H12O6."
 		elif self.operacion == 'Convertir Masa a Moles':
 			mensaje = "Ingrese la masa en gramos y la masa molar del compuesto en g/mol."
-		# Añade mensajes de ayuda para las demás operaciones
+		elif self.operacion == 'Calcular Número de Partículas':
+			mensaje = "Ingrese la cantidad de moles para calcular el número de partículas usando el número de Avogadro."
+		elif self.operacion == 'Calcular Concentración Molar':
+			mensaje = "Ingrese el número de moles del soluto y el volumen de la solución en litros."
+		elif self.operacion == 'Calcular pH':
+			mensaje = "Ingrese la concentración de iones H+ en mol/L para calcular el pH de la solución."
+		elif self.operacion == 'Calcular Rendimiento Porcentual':
+			mensaje = "Ingrese el rendimiento real y el rendimiento teórico para calcular el rendimiento porcentual."
+		elif self.operacion == 'Ley de Gases Ideales':
+			mensaje = ("Seleccione la variable que desea calcular y proporcione los valores de las otras tres.\n"
+					   "La ley de los gases ideales es PV = nRT.\n"
+					   "Ingrese los valores en las unidades indicadas:\n"
+					   "- Presión (P) en atmósferas (atm)\n"
+					   "- Volumen (V) en litros (L)\n"
+					   "- Número de moles (n) en moles (mol)\n"
+					   "- Temperatura (T) en Kelvin (K)")
+		elif self.operacion == 'Calcular Constante de Equilibrio':
+			mensaje = ("Ingrese las concentraciones molares de productos y reactivos en el formato:\n"
+					   "compuesto=concentración, separado por comas.\n"
+					   "Ejemplo de productos: CO2=0.5, H2O=1.0\n"
+					   "Ejemplo de reactivos: C6H12O6=0.1, O2=0.8")
+		elif self.operacion == 'Energía de Enlace':
+			mensaje = ("Ingrese los enlaces y sus cantidades en el formato:\n"
+					   "enlace=cantidad, separado por comas.\n"
+					   "Ejemplo de enlaces: C-H=4, C=C=1\n"
+					   "Ingrese las energías de enlace en kJ/mol en el mismo formato:\n"
+					   "Ejemplo de energías: C-H=413, C=C=614")
 		else:
 			mensaje = "Operación no soportada."
 		wx.MessageBox(mensaje, "Ayuda", wx.OK | wx.ICON_INFORMATION)
@@ -810,6 +1001,30 @@ class DialogoQuimica(wx.Dialog):
 	def salir(self, event):
 		"""Cierra el diálogo actual."""
 		self.Destroy()
+
+	def parsear_concentraciones(self, cadena):
+		"""Convierte una cadena de texto en un diccionario de concentraciones."""
+		try:
+			resultado = {}
+			pares = cadena.split(',')
+			for par in pares:
+				compuesto, valor = par.strip().split('=')
+				resultado[compuesto.strip()] = float(valor.strip())
+			return resultado
+		except Exception:
+			raise ValueError("Formato incorrecto. Use el formato compuesto=concentración, separado por comas.")
+
+	def parsear_diccionario(self, cadena):
+		"""Convierte una cadena de texto en un diccionario."""
+		try:
+			resultado = {}
+			pares = cadena.split(',')
+			for par in pares:
+				clave, valor = par.strip().split('=')
+				resultado[clave.strip()] = float(valor.strip())
+			return resultado
+		except Exception:
+			raise ValueError("Formato incorrecto. Use el formato clave=valor, separado por comas.")
 
 
 if __name__ == '__main__':
