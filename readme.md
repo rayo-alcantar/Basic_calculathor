@@ -52,8 +52,7 @@ Si deseas distribuir la aplicación sin necesidad de que los usuarios tengan Pyt
 Ejecuta el siguiente comando en la terminal desde el directorio donde se encuentra `calc.py`:
 
 ```bash
-pyinstaller --windowed --onedir --name basic_calculathor0.4 calc.py --add-data "documentacion.html;." \
---hidden-import=packaging
+pyinstaller --windowed --onedir --name basic_calculathor0.4.1 calc.py --add-data "documentacion.html;." --hidden-import=packaging
 ```
 
 **Nota**: Este comando es para sistemas Windows. Si estás en macOS o Linux, reemplaza `;` por `:` en la opción `--add-data`:

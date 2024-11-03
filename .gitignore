@@ -63,3 +63,4 @@ pip-delete-this-directory.txt
 ~$*.*
 *.tmp
 *.temp
+virtual/

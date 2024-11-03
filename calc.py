@@ -12,7 +12,7 @@ import math
 
 from operaciones import Aritmetica, Conversion, Trigonometria, CambioBases, Geometria, Quimica, Estadistica
 
-VERSION = '0.4' 
+VERSION = '0.4.1'
 
 class Calculadora(wx.Frame):
 	"""Ventana principal de la calculadora."""
@@ -51,24 +51,44 @@ class Calculadora(wx.Frame):
 					data = response.json()
 					ultima_version = data['tag_name'].lstrip('v')  # Obtener el número de versión sin la 'v'
 					
+					# Obtener la URL y nombre del primer asset de la release
+					assets = data.get('assets', [])
+					if assets:
+						url_asset = assets[0]['browser_download_url']
+						asset_name = assets[0]['name']
+						# Ruta completa del archivo zip descargado
+						ruta_zip = os.path.join(os.getcwd(), asset_name)
+					else:
+						asset_name = None
+						ruta_zip = None
+
 					# Comparar versiones utilizando packaging.version
 					if version.parse(ultima_version) > version.parse(VERSION):
-						# Obtener la URL del primer asset de la release
-						assets = data.get('assets', [])
-						if assets:
-							url_asset = assets[0]['browser_download_url']
-							asset_name = assets[0]['name']
-							wx.CallAfter(self.notificar_nueva_version, ultima_version, url_asset, asset_name)
+						# La versión disponible es más reciente
+						# Verificar si el zip está presente
+						if ruta_zip and os.path.exists(ruta_zip):
+							wx.CallAfter(self.mostrar_error_zip_no_descomprimido)
 						else:
-							print("No hay assets disponibles para descargar en la última release.")
+							wx.CallAfter(self.notificar_nueva_version, ultima_version, url_asset, asset_name)
 					else:
 						# La versión disponible no es más reciente
-						pass
+						# Si hay un zip presente, eliminarlo silenciosamente
+						if ruta_zip and os.path.exists(ruta_zip):
+							try:
+								os.remove(ruta_zip)
+							except Exception as e:
+								print(f"Error al eliminar el archivo zip: {e}")
 				else:
 					print("No se pudo comprobar si hay actualizaciones.")
 			except Exception as e:
 				print(f"Error al comprobar actualizaciones: {e}")
 		threading.Thread(target=check_update).start()
+
+	def mostrar_error_zip_no_descomprimido(self):
+		"""Muestra un error indicando que el archivo zip no ha sido descomprimido."""
+		mensaje = ("Se ha detectado que hay una actualización descargada pero no descomprimida.\n"
+				   "Por favor, descomprima el archivo zip descargado para actualizar a la última versión.")
+		wx.MessageBox(mensaje, "Actualización pendiente", wx.OK | wx.ICON_ERROR)
 
 	def notificar_nueva_version(self, ultima_version, url_asset, asset_name):
 		"""Notifica al usuario que hay una nueva versión y ofrece descargarla."""
@@ -82,9 +102,20 @@ class Calculadora(wx.Frame):
 
 	def descargar_actualizacion(self, ultima_version, url_asset, asset_name):
 		"""Descarga la actualización y guía al usuario para instalarla."""
+		# Crear un diálogo de progreso
+		self.progress_dialog = wx.ProgressDialog(
+			"Descargando actualización",
+			"Por favor, espere mientras se descarga la actualización...",
+			maximum=100,
+			parent=self,
+			style=wx.PD_APP_MODAL | wx.PD_ELAPSED_TIME
+		)
+
 		def download():
 			try:
 				respuesta = requests.get(url_asset, stream=True)
+				total_size = int(respuesta.headers.get('content-length', 0))
+				downloaded_size = 0
 				if respuesta.status_code == 200:
 					# Guardar el archivo descargado con su nombre original
 					nombre_archivo = asset_name
@@ -92,6 +123,11 @@ class Calculadora(wx.Frame):
 						for chunk in respuesta.iter_content(chunk_size=1024):
 							if chunk:
 								archivo.write(chunk)
+								downloaded_size += len(chunk)
+								# Calcular el porcentaje de progreso
+								porcentaje = int(downloaded_size * 100 / total_size)
+								# Actualizar la barra de progreso
+								wx.CallAfter(self.update_progress, porcentaje)
 					wx.CallAfter(self.informar_descarga_exitosa, nombre_archivo)
 				else:
 					wx.CallAfter(self.mostrar_error_descarga, "No se pudo descargar la actualización.")
@@ -99,18 +135,34 @@ class Calculadora(wx.Frame):
 				wx.CallAfter(self.mostrar_error_descarga, f"Error al descargar la actualización: {e}")
 		threading.Thread(target=download).start()
 
+	def update_progress(self, porcentaje):
+		"""Actualiza la barra de progreso."""
+		self.progress_dialog.Update(porcentaje, f"Descargando... {porcentaje}% completado")
+
 	def informar_descarga_exitosa(self, nombre_archivo):
 		"""Informa al usuario que la descarga fue exitosa y cómo actualizar."""
-		mensaje = (f"La nueva versión se ha descargado como '{nombre_archivo}'.\n\n"
-				   "Para actualizar:\n"
-				   "1. Cierre la aplicación actual.\n"
-				   "2. Descomprima o ejecute el archivo descargado, según corresponda.\n"
-				   "3. Siga las instrucciones de instalación proporcionadas.\n\n"
-				   "Si está utilizando el ejecutable, extraiga el archivo y reemplace el archivo '.exe' con el nuevo.")
-		wx.MessageBox(mensaje, "Descarga completada", wx.OK | wx.ICON_INFORMATION)
-	
+		# Cerrar el diálogo de progreso
+		if hasattr(self, 'progress_dialog'):
+			self.progress_dialog.Destroy()
+
+		mensaje = (
+			f"La nueva versión se ha descargado como '{nombre_archivo}'.\n\n"
+			"Para actualizar:\n"
+			"1. Cierre esta aplicación.\n"
+			"2. Descomprima el archivo descargado (archivo .zip).\n"
+			"3. Copie el contenido y reemplace los archivos existentes.\n\n"
+			"Nota: Al pulsar 'Aceptar', la aplicación se cerrará."
+		)
+		dlg = wx.MessageDialog(self, mensaje, "Descarga completada", wx.OK | wx.ICON_INFORMATION)
+		if dlg.ShowModal() == wx.ID_OK:
+			dlg.Destroy()
+			self.Close()  # Cierra la aplicación
+
 	def mostrar_error_descarga(self, mensaje_error):
 		"""Muestra un mensaje de error si la descarga falla."""
+		# Cerrar el diálogo de progreso si existe
+		if hasattr(self, 'progress_dialog'):
+			self.progress_dialog.Destroy()
 		wx.MessageBox(mensaje_error, "Error de descarga", wx.OK | wx.ICON_ERROR)
 
 	def crear_menu(self):
@@ -119,8 +171,56 @@ class Calculadora(wx.Frame):
 		menu_opciones = wx.Menu()
 		menu_acerca_de = menu_opciones.Append(wx.ID_ABOUT, "&Acerca de\tCtrl+A", "Información del desarrollador")
 		self.Bind(wx.EVT_MENU, self.mostrar_acerca_de, menu_acerca_de)
+
+		# Agregar el menú para crear acceso directo
+		menu_crear_acceso_directo = menu_opciones.Append(wx.ID_ANY, "&Crear Acceso Directo", "Crea un acceso directo en el escritorio")
+		self.Bind(wx.EVT_MENU, self.crear_acceso_directo, menu_crear_acceso_directo)
+
 		menubar.Append(menu_opciones, "&Opciones")
 		self.SetMenuBar(menubar)
+
+	def crear_acceso_directo(self, event):
+		"""Crea un acceso directo en el escritorio."""
+		try:
+			# Importar aquí para evitar errores si el módulo no está instalado
+			import pythoncom
+			import win32com.client
+
+			# Obtener la ruta al escritorio
+			def get_desktop_path():
+				"""Obtiene la ruta al escritorio del usuario."""
+				try:
+					from ctypes import windll, create_unicode_buffer
+					CSIDL_DESKTOPDIRECTORY = 0x10
+					MAX_PATH = 260
+					buf = create_unicode_buffer(MAX_PATH)
+					windll.shell32.SHGetFolderPathW(None, CSIDL_DESKTOPDIRECTORY, None, 0, buf)
+					return buf.value
+				except Exception:
+					return os.path.join(os.environ["USERPROFILE"], "Desktop")
+
+			desktop_path = get_desktop_path()
+			nombre_acceso = "Calculadora Básica.lnk"
+			ruta_acceso = os.path.join(desktop_path, nombre_acceso)
+			
+			# Obtener la ruta completa al ejecutable
+			if getattr(sys, 'frozen', False):
+				# Si está empaquetado con PyInstaller
+				ruta_ejecutable = sys.executable
+			else:
+				# Si se está ejecutando desde el script
+				ruta_ejecutable = os.path.abspath(__file__)
+
+			shell = win32com.client.Dispatch("WScript.Shell")
+			shortcut = shell.CreateShortCut(ruta_acceso)
+			shortcut.Targetpath = ruta_ejecutable
+			shortcut.WorkingDirectory = os.path.dirname(ruta_ejecutable)
+			shortcut.IconLocation = ruta_ejecutable
+			shortcut.save()
+			
+			wx.MessageBox("Se ha creado el acceso directo en el escritorio.", "Acceso Directo", wx.OK | wx.ICON_INFORMATION)
+		except Exception as e:
+			wx.MessageBox(f"No se pudo crear el acceso directo: {e}", "Error", wx.OK | wx.ICON_ERROR)
 
 	def abrir_documentacion(self, event):
 		"""Abre la documentación en el navegador web predeterminado."""
@@ -137,9 +237,11 @@ class Calculadora(wx.Frame):
 
 	def mostrar_acerca_de(self, event):
 		"""Muestra la información del desarrollador."""
-		info = ("programa simple para realizar una calculadora accesible con lector de pantalla. Nombre del desarrollador: Ángel Alcántar.\n"
+		info = ("Programa simple para realizar una calculadora accesible con lector de pantalla.\n"
+				"Nombre del desarrollador: Ángel Alcántar.\n"
 				"Email: rayoalcantar@gmail.com.\nTodos los derechos reservados.")
 		wx.MessageBox(info, "Acerca de", wx.OK | wx.ICON_INFORMATION)
+
 
 	def mostrar_categorias(self, event):
 		"""Muestra las categorías de operaciones disponibles."""
