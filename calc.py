@@ -9,10 +9,12 @@ from packaging import version
 import os
 import threading
 import math
+import subprocess
+
 
 from operaciones import Aritmetica, Conversion, Trigonometria, CambioBases, Geometria, Quimica, Estadistica
 
-VERSION = '0.4.1'
+VERSION = '0.4'
 
 class Calculadora(wx.Frame):
 	"""Ventana principal de la calculadora."""
@@ -144,19 +146,41 @@ class Calculadora(wx.Frame):
 		# Cerrar el diálogo de progreso
 		if hasattr(self, 'progress_dialog'):
 			self.progress_dialog.Destroy()
-
+	
 		mensaje = (
 			f"La nueva versión se ha descargado como '{nombre_archivo}'.\n\n"
-			"Para actualizar:\n"
-			"1. Cierre esta aplicación.\n"
-			"2. Descomprima el archivo descargado (archivo .zip).\n"
-			"3. Copie el contenido y reemplace los archivos existentes.\n\n"
-			"Nota: Al pulsar 'Aceptar', la aplicación se cerrará."
+			"La aplicación se actualizará automáticamente y se reiniciará.\n"
+			"Por favor, espere..."
 		)
-		dlg = wx.MessageDialog(self, mensaje, "Descarga completada", wx.OK | wx.ICON_INFORMATION)
-		if dlg.ShowModal() == wx.ID_OK:
-			dlg.Destroy()
-			self.Close()  # Cierra la aplicación
+		wx.MessageBox(mensaje, "Descarga completada", wx.OK | wx.ICON_INFORMATION)
+	
+		# Ejecutar el ejecutable de actualización
+		if getattr(sys, 'frozen', False):
+			# Si la aplicación está empaquetada
+			current_dir = os.path.dirname(sys.executable)
+		else:
+			# Si se está ejecutando desde el script
+			current_dir = os.path.dirname(os.path.abspath(__file__))
+	
+		update_exe = os.path.join(current_dir, 'update.exe')
+		zip_path = os.getcwd()
+	
+		# Verificar que update.exe existe
+		if not os.path.exists(update_exe):
+			wx.MessageBox("El actualizador 'update.exe' no se encontró.", "Error", wx.OK | wx.ICON_ERROR)
+			return
+	
+		# Ejecutar el ejecutable de actualización en un nuevo proceso
+		try:
+			subprocess.Popen([update_exe, nombre_archivo, zip_path], shell=False)
+		except Exception as e:
+			wx.MessageBox(f"Error al ejecutar el actualizador: {e}", "Error", wx.OK | wx.ICON_ERROR)
+			return
+	
+		# Asegurar que la aplicación se cierra completamente
+		self.Destroy()
+		wx.GetApp().ExitMainLoop()
+		sys.exit(0)
 
 	def mostrar_error_descarga(self, mensaje_error):
 		"""Muestra un mensaje de error si la descarga falla."""
