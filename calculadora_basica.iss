@@ -5,8 +5,7 @@
 #define MyAppVersion "1.1"
 #define MyAppPublisher "Rayoscompany"
 #define MyAppURL "https://rayoscompany.com"
-#define MyAppExeName "calc.exe"
-
+#define MyAppExeName "basic_calculathor1.1.exe"
 [Setup]
 ; El valor de AppId identifica de forma única esta aplicación. No utilices el mismo valor de AppId en instaladores para otras aplicaciones.
 ; (Para generar un nuevo GUID, haz clic en Herramientas | Generar GUID en el IDE.)
@@ -32,7 +31,7 @@ PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 
 ; Configuración de salida del instalador
-OutputDir=Calculadora_básica_setup
+OutputDir=calculadoraBasicaInstaller
 OutputBaseFilename=calculadora_básica_installer
 Compression=lzma
 SolidCompression=yes
