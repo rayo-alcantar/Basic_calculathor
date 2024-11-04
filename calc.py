@@ -188,20 +188,53 @@ class Calculadora(wx.Frame):
 		if hasattr(self, 'progress_dialog'):
 			self.progress_dialog.Destroy()
 		wx.MessageBox(mensaje_error, "Error de descarga", wx.OK | wx.ICON_ERROR)
-
 	def crear_menu(self):
-		"""Crea el menú de opciones."""
-		menubar = wx.MenuBar()
-		menu_opciones = wx.Menu()
-		menu_acerca_de = menu_opciones.Append(wx.ID_ABOUT, "&Acerca de\tCtrl+A", "Información del desarrollador")
-		self.Bind(wx.EVT_MENU, self.mostrar_acerca_de, menu_acerca_de)
+			"""Crea el menú de opciones."""
+			menubar = wx.MenuBar()
+			menu_opciones = wx.Menu()
+			
+			# Opción "Acerca de"
+			menu_acerca_de = menu_opciones.Append(wx.ID_ABOUT, "&Acerca de\tCtrl+A", "Información del desarrollador")
+			self.Bind(wx.EVT_MENU, self.mostrar_acerca_de, menu_acerca_de)
+	
+			# Opción "Crear Acceso Directo"
+			menu_crear_acceso_directo = menu_opciones.Append(wx.ID_ANY, "&Crear Acceso Directo", "Crea un acceso directo en el escritorio")
+			self.Bind(wx.EVT_MENU, self.crear_acceso_directo, menu_crear_acceso_directo)
+			
+			# Opción "Abrir Carpeta del Programa"
+			menu_abrir_carpeta = menu_opciones.Append(wx.ID_ANY, "&Abrir Carpeta del Programa", "Abre la carpeta donde está instalado el programa")
+			self.Bind(wx.EVT_MENU, self.abrir_carpeta_programa, menu_abrir_carpeta)
+	
+			menubar.Append(menu_opciones, "&Opciones")
+			self.SetMenuBar(menubar)
 
-		# Agregar el menú para crear acceso directo
-		menu_crear_acceso_directo = menu_opciones.Append(wx.ID_ANY, "&Crear Acceso Directo", "Crea un acceso directo en el escritorio")
-		self.Bind(wx.EVT_MENU, self.crear_acceso_directo, menu_crear_acceso_directo)
-
-		menubar.Append(menu_opciones, "&Opciones")
-		self.SetMenuBar(menubar)
+	def abrir_carpeta_programa(self, event):
+				"""Abre la carpeta donde está ubicado el ejecutable de la aplicación."""
+				try:
+					# Determinar la ruta del ejecutable o del script
+					if getattr(sys, 'frozen', False):
+						# La aplicación está empaquetada como un ejecutable (.exe)
+						ruta_ejecutable = os.path.dirname(sys.executable)
+					else:
+						# La aplicación se está ejecutando como un script de Python
+						ruta_ejecutable = os.path.dirname(os.path.abspath(__file__))
+					
+					# Verificar que la ruta existe
+					if not os.path.exists(ruta_ejecutable):
+						raise FileNotFoundError(f"La ruta {ruta_ejecutable} no existe.")
+		
+					# Abrir la carpeta en el explorador de archivos según el sistema operativo
+					if sys.platform.startswith('win'):
+						os.startfile(ruta_ejecutable)
+					elif sys.platform.startswith('darwin'):
+						subprocess.Popen(['open', ruta_ejecutable])
+					elif sys.platform.startswith('linux'):
+						subprocess.Popen(['xdg-open', ruta_ejecutable])
+					else:
+						raise OSError("Sistema operativo no soportado para abrir la carpeta automáticamente.")
+				
+				except Exception as e:
+					wx.MessageBox(f"Error al abrir la carpeta del programa: {e}", "Error", wx.OK | wx.ICON_ERROR)
 
 	def crear_acceso_directo(self, event):
 		"""Crea un acceso directo en el escritorio."""

@@ -2,10 +2,10 @@
 ; ¡Consulta la documentación para obtener detalles sobre cómo crear archivos de script de Inno Setup!
 
 #define MyAppName "Calculadora básica"
-#define MyAppVersion "1.0"
+#define MyAppVersion "1.1"
 #define MyAppPublisher "Rayoscompany"
 #define MyAppURL "https://rayoscompany.com"
-#define MyAppExeName "basic_calculathor1.0.exe"
+#define MyAppExeName "basic_calculathor.exe"
 
 [Setup]
 ; El valor de AppId identifica de forma única esta aplicación. No utilices el mismo valor de AppId en instaladores para otras aplicaciones.
@@ -25,7 +25,7 @@ DefaultGroupName={#MyAppName}
 CreateAppDir=yes
 
 ; Mostrar información antes de la instalación
-InfoBeforeFile=C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.0\_internal\documentacion.html
+InfoBeforeFile=C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.1\_internal\documentacion.html
 
 ; Requerir privilegios mínimos (no requiere administrador)
 PrivilegesRequired=lowest
@@ -44,13 +44,13 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 ; Copiar el ejecutable principal
-Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.0\basic_calculathor1.0.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.1\basic_calculathor1.1.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 ; Copiar el actualizador
-Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.0\update.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.1\update.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 ; Copiar la carpeta "_internal" y su contenido
-Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.0\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.1\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; Nota: No utilices "Flags: ignoreversion" en archivos de sistema compartidos
 
