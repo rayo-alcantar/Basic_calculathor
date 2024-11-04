@@ -33,7 +33,7 @@ PrivilegesRequiredOverridesAllowed=dialog
 
 ; Configuración de salida del instalador
 OutputDir=Calculadora_básica_setup
-OutputBaseFilename=calculadora_installer
+OutputBaseFilename=calculadora_básica_installer
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
