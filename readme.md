@@ -58,6 +58,13 @@ pyinstaller --windowed --onedir --name basic_calculathor1.1 calc.py --add-data "
 
 ```
 
+Para compilar el actualizador:
+```bash
+```bash
+pyinstaller --onefile --name update update.py
+```
+
+
 **Nota**: Este comando es para sistemas Windows. Si estás en macOS o Linux, reemplaza `;` por `:` en la opción `--add-data`:
 
 ```bash
