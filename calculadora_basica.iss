@@ -1,11 +1,11 @@
 ; Script generado por el Asistente de Inno Setup.
 ; ¡Consulta la documentación para obtener detalles sobre cómo crear archivos de script de Inno Setup!
 
-#define MyAppName "Calculadora básica"
+#define MyAppName "basic_calculathor"
 #define MyAppVersion "1.1"
 #define MyAppPublisher "Rayoscompany"
 #define MyAppURL "https://rayoscompany.com"
-#define MyAppExeName "basic_calculathor.exe"
+#define MyAppExeName "calc.exe"
 
 [Setup]
 ; El valor de AppId identifica de forma única esta aplicación. No utilices el mismo valor de AppId en instaladores para otras aplicaciones.
@@ -20,12 +20,12 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 
 ; Configurar la carpeta de instalación en el directorio local del usuario
-DefaultDirName={localappdata}\{#MyAppName}
+DefaultDirName={localappdata}\{#MyAppName}{#MyAppVersion}
 DefaultGroupName={#MyAppName}
 CreateAppDir=yes
 
 ; Mostrar información antes de la instalación
-InfoBeforeFile=C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.1\_internal\documentacion.html
+InfoBeforeFile={app}\documentacion.html
 
 ; Requerir privilegios mínimos (no requiere administrador)
 PrivilegesRequired=lowest
@@ -44,13 +44,13 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 ; Copiar el ejecutable principal
-Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.1\basic_calculathor1.1.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.1\calc.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 ; Copiar el actualizador
 Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.1\update.exe"; DestDir: "{app}"; Flags: ignoreversion
 
-; Copiar la carpeta "_internal" y su contenido
-Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.1\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Copiar la documentación
+Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.1\documentacion.html"; DestDir: "{app}"; Flags: ignoreversion
 
 ; Nota: No utilices "Flags: ignoreversion" en archivos de sistema compartidos
 
@@ -68,4 +68,3 @@ Filename: "{app}\{#MyAppExeName}"; Description: "Ejecutar {#MyAppName}"; Flags: 
 [Tasks]
 ; Opción para crear un icono en el Escritorio
 Name: "desktopicon"; Description: "Crear un icono en el Escritorio"; GroupDescription: "Opciones adicionales"; Flags: unchecked
-

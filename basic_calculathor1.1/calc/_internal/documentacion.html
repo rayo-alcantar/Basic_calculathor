@@ -1,0 +1,120 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Documentación de la Calculadora Básica</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        h2 { color: #555; }
+        p { font-size: 16px; line-height: 1.5; }
+        ul { list-style-type: disc; margin-left: 20px; }
+        ol { margin-left: 20px; }
+        .developer { margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Bienvenido a la Calculadora Básica</h1>
+    <p>Esta calculadora te permite realizar diversas operaciones matemáticas de una manera sencilla y fácil de entender.</p>
+
+    <h2>Cómo usar la calculadora</h2>
+    <p>Al iniciar la aplicación, verás un botón llamado <strong>"Operaciones"</strong>. Al hacer clic en este botón, se abrirá una lista de categorías de operaciones disponibles.</p>
+
+    <h3>Categorías de Operaciones</h3>
+    <ul>
+        <li><strong>Aritmética:</strong> Suma, resta, multiplicación, división, raíces, potencias, logaritmos y expresiones matemáticas.</li>
+        <li><strong>Conversión de Unidades:</strong> Convierte entre diferentes unidades como longitud, temperatura, tiempo, etc.</li>
+        <li><strong>Trigonometría:</strong> Calcula funciones trigonométricas como seno, coseno y tangente.</li>
+        <li><strong>Cambio de Bases:</strong> Convierte números entre bases numéricas como binario, decimal y hexadecimal.</li>
+        <li><strong>Geometría:</strong> Calcula áreas y perímetros de figuras geométricas simples.</li>
+        <li><strong>Química:</strong>Realiza operaciones de química orgánica con gases, moles y PH.</li>
+        <li><strong>Estadística:</strong>Realiza operaciones de estadística descriptiva; media, mediana, percentiles, cuartiles, ETC.</li>
+    </ul>
+
+    <h2>Realizando una operación</h2>
+    <ol>
+        <li>Haz clic en el botón <strong>"Operaciones"</strong>.</li>
+        <li>Selecciona una categoría de la lista que aparece.</li>
+        <li>Elige la operación específica que deseas realizar dentro de esa categoría.</li>
+        <li>Ingresa los valores solicitados en los campos correspondientes.</li>
+        <li>Haz clic en el botón <strong>"Calcular"</strong> para obtener el resultado.</li>
+        <li>Si necesitas ayuda sobre cómo usar una operación, puedes hacer clic en el botón <strong>"Ayuda"</strong>.</li>
+    </ol>
+
+    <h2>Ejemplos de uso</h2>
+    <p>Aquí tienes algunos ejemplos de cómo usar la calculadora:</p>
+    <ul>
+        <li><strong>Suma:</strong> Para sumar 5 + 3, selecciona "Aritmética" y luego "Suma". Ingresa 5 y 3 en los campos y haz clic en "Calcular".</li>
+        <li><strong>Conversión de temperatura:</strong> Para convertir 100 grados Celsius a Fahrenheit, selecciona "Conversión de Unidades", luego "Temperatura". Ingresa 100, selecciona "Celsius" como unidad de origen y "Fahrenheit" como unidad de destino.</li>
+        <li><strong>Seno de un ángulo:</strong> Para calcular el seno de 30 grados, selecciona "Trigonometría" y luego "Seno". Ingresa 30 en el campo y haz clic en "Calcular".</li>
+    </ul>
+<h2>Historial de cambios</h2>
+<h3>Versión 1.2</h3>
+<ul>
+<li>Se añade un botón para abrir la carpeta donde esté instalado el programa; útil por si ocurrió algún error con la actualización,  poder descompirmir, eliminar y leer el log de la actualización.</li>
+</ul>
+<h3>Versión 1.1</h3>
+<ul>
+<li>Se realizan cambios menores a algunas interfaces.</li>
+<li>Se hacen más explícitos los errores.</li>
+<li>Se intenta mejorar el actualizador.</li>
+</ul>
+<h3>Versión 1.0</h3>
+<ul>
+<li>Se automatiza todo el proceso de las actualizaciones. Ahora se harán automáticamente y en caso de que no funcionen, se creará un archivo llamado actualización.log donde estará el registro de errores.</li>
+<li>El código se hace más robusto.</li>
+</ul>
+<h3>Versión 0.4.1</h3>
+<ul>
+<li>Se mejoró la estabilidad de la calculadora.</li>
+<li>Se modificó la forma de actualizar; ahora incluye una barra de progreso.</li>
+<li>Se permite añadir un acceso directo desde la aplicación; alt, menú opciones, crear acceso directo.</li>
+</ul>
+<h3>Versión 0.4</h3>
+<ul>
+<li>Se añaden muchas operaciones de química orgánica.</li>
+<li>Se añaden operaciones de estadística.</li>
+</ul>
+<h3>Versión 0.3</h3>
+<ul>
+<li>Se le añade actualizador.</li>
+
+</ul>
+    <div class="developer">
+        <h2>Para Desarrolladores</h2>
+        <p>Esta sección está destinada a quienes deseen entender cómo está construida la aplicación o quieran añadir nuevas operaciones.</p>
+<h3>Descargar el código fuente</h3>
+<p>Puedes descargar el código fuente desde el repositorio en github <a href="https://github.com/rayo-alcantar/Basic_calculathor"> haciendo click aquí.</a></p>
+        <h3>Estructura de la Aplicación</h3>
+        <p>La calculadora está construida utilizando Python y la biblioteca gráfica wxPython. El código está organizado en dos archivos principales:</p>
+        <ul>
+            <li><strong>calc.py:</strong> Contiene la interfaz gráfica y la lógica de interacción con el usuario.</li>
+            <li><strong>operaciones.py:</strong> Contiene las clases y métodos que realizan las operaciones matemáticas.</li>
+        </ul>
+
+        <h3>Añadiendo Nuevas Operaciones</h3>
+        <p>Para agregar una nueva operación, sigue estos pasos:</p>
+        <ol>
+            <li>En <strong>operaciones.py</strong>, crea una nueva clase o añade un método a una clase existente que implemente la lógica de la nueva operación.</li>
+            <li>En <strong>calc.py</strong>, actualiza la interfaz gráfica:
+                <ul>
+                    <li>Agrega la nueva operación a la lista correspondiente en el método que muestra las categorías u operaciones.</li>
+                    <li>Crea una nueva clase de diálogo si es necesario, siguiendo el formato de las clases existentes como <code>DialogoAritmetica</code>.</li>
+                    <li>Implementa los campos de entrada y los botones necesarios en la nueva clase de diálogo.</li>
+                </ul>
+            </li>
+            <li>Enlaza la nueva operación con el método correspondiente en <strong>operaciones.py</strong> cuando el usuario haga clic en "Calcular".</li>
+        </ol>
+
+        <h3>Arquitectura General</h3>
+        <p>La aplicación sigue una arquitectura modular donde la interfaz de usuario está separada de la lógica de negocio. Esto facilita el mantenimiento y la ampliación de la aplicación.</p>
+        <ul>
+            <li><strong>Interfaz de Usuario (calc.py):</strong> Maneja todos los elementos gráficos, eventos y diálogos con los usuarios.</li>
+            <li><strong>Lógica de Negocio (operaciones.py):</strong> Contiene las funciones matemáticas y de conversión que realizan los cálculos.</li>
+        </ul>
+
+        <p>La comunicación entre ambos módulos se realiza a través de llamadas a métodos específicos en respuesta a eventos generados por la interacción del usuario con la interfaz.</p>
+        <p>Programa desarrollado por ángel Alcantar; <a href="https://github.com/rayo-alcantar">Ir a su github.</a></p>
+    </div>
+</body>
+</html>
