@@ -149,8 +149,8 @@ class Calculadora(wx.Frame):
 	
 		mensaje = (
 			f"La nueva versión se ha descargado como '{nombre_archivo}'.\n\n"
-			"La aplicación se actualizará automáticamente y se reiniciará.\n"
-			"Por favor, espere..."
+			"La aplicación se actualizará automáticamente y se cerrará; al finalizar la actualización, por favor abre de nuevo el programa. Si el acceso directo del escritorio no funciona, prueba buscar calculadora básica en el menú inicio.\n"
+			"pulse enter para continuar..."
 		)
 		wx.MessageBox(mensaje, "Descarga completada", wx.OK | wx.ICON_INFORMATION)
 	
