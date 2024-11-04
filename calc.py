@@ -1036,31 +1036,34 @@ class DialogoCambioBases(wx.Dialog):
 class DialogoGeometria(wx.Dialog):
 	"""Diálogo para operaciones geométricas."""
 	def __init__(self, parent, figura):
-		super().__init__(parent, title=figura, size=(350, 300))
+		super().__init__(parent, title=figura, size=(450, 400))
 		self.figura = figura
 
 		vbox = wx.BoxSizer(wx.VERTICAL)
 
+		# Ajustar los campos de entrada según la figura seleccionada
 		if 'Círculo' in figura:
 			lbl_radio = wx.StaticText(self, label="Ingrese el radio:")
 			self.txt_radio = wx.TextCtrl(self)
-			vbox.Add(lbl_radio, flag=wx.LEFT|wx.TOP, border=10)
-			vbox.Add(self.txt_radio, flag=wx.EXPAND|wx.LEFT|wx.RIGHT, border=10)
+			vbox.Add(lbl_radio, flag=wx.LEFT | wx.TOP, border=15)
+			vbox.Add(self.txt_radio, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=15)
 		elif 'Triángulo' in figura:
 			lbl_base = wx.StaticText(self, label="Ingrese la base:")
 			self.txt_base = wx.TextCtrl(self)
 			lbl_altura = wx.StaticText(self, label="Ingrese la altura:")
 			self.txt_altura = wx.TextCtrl(self)
-			vbox.Add(lbl_base, flag=wx.LEFT|wx.TOP, border=10)
-			vbox.Add(self.txt_base, flag=wx.EXPAND|wx.LEFT|wx.RIGHT, border=10)
-			vbox.Add(lbl_altura, flag=wx.LEFT|wx.TOP, border=10)
-			vbox.Add(self.txt_altura, flag=wx.EXPAND|wx.LEFT|wx.RIGHT, border=10)
+			vbox.Add(lbl_base, flag=wx.LEFT | wx.TOP, border=15)
+			vbox.Add(self.txt_base, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=15)
+			vbox.Add(lbl_altura, flag=wx.LEFT | wx.TOP, border=15)
+			vbox.Add(self.txt_altura, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=15)
 
+		# Campo para mostrar el resultado
 		lbl_resultado = wx.StaticText(self, label="Resultado:")
 		self.txt_resultado = wx.TextCtrl(self, style=wx.TE_READONLY)
-		vbox.Add(lbl_resultado, flag=wx.LEFT | wx.TOP, border=10)
-		vbox.Add(self.txt_resultado, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+		vbox.Add(lbl_resultado, flag=wx.LEFT | wx.TOP, border=15)
+		vbox.Add(self.txt_resultado, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=15)
 
+		# Botones de acción
 		hbox = wx.BoxSizer(wx.HORIZONTAL)
 		btn_calcular = wx.Button(self, label="&Calcular")
 		btn_calcular.Bind(wx.EVT_BUTTON, self.calcular)
@@ -1068,46 +1071,104 @@ class DialogoGeometria(wx.Dialog):
 		btn_ayuda.Bind(wx.EVT_BUTTON, self.mostrar_ayuda)
 		btn_salir = wx.Button(self, label="&Salir")
 		btn_salir.Bind(wx.EVT_BUTTON, self.salir)
-		hbox.Add(btn_calcular, flag=wx.RIGHT, border=5)
-		hbox.Add(btn_ayuda, flag=wx.RIGHT, border=5)
+		hbox.Add(btn_calcular, flag=wx.RIGHT, border=10)
+		hbox.Add(btn_ayuda, flag=wx.RIGHT, border=10)
 		hbox.Add(btn_salir)
 
-		vbox.Add(hbox, flag=wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=10)
+		vbox.Add(hbox, flag=wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=20)
 
 		self.SetSizer(vbox)
+
+		# Establecer el foco en el primer campo de entrada para mejorar la accesibilidad
+		if 'Círculo' in self.figura:
+			self.txt_radio.SetFocus()
+		elif 'Triángulo' in self.figura:
+			self.txt_base.SetFocus()
 
 	def calcular(self, event):
 		"""Realiza el cálculo geométrico seleccionado."""
 		try:
 			if 'Círculo' in self.figura:
-				radio = float(self.txt_radio.GetValue())
+				radio_str = self.txt_radio.GetValue().strip()
+				if not radio_str:
+					raise ValueError("El campo 'Ingrese el radio' no puede estar vacío.")
+				radio = self.validar_numero(radio_str, self.txt_radio, "Por favor, ingrese un radio numérico válido.")
+				if radio <= 0:
+					raise ValueError("El radio debe ser un número positivo.")
+
 				if 'Área' in self.figura:
 					resultado = Geometria.area_circulo(radio)
 				elif 'Perímetro' in self.figura:
 					resultado = Geometria.perimetro_circulo(radio)
+				else:
+					raise ValueError("Operación no soportada para Círculo.")
+
+				self.txt_resultado.SetValue(str(resultado))
+				self.txt_resultado.SetFocus()
 				self.txt_radio.SetValue("")
+
 			elif 'Triángulo' in self.figura:
-				base = float(self.txt_base.GetValue())
-				altura = float(self.txt_altura.GetValue())
+				base_str = self.txt_base.GetValue().strip()
+				altura_str = self.txt_altura.GetValue().strip()
+				if not base_str:
+					raise ValueError("El campo 'Ingrese la base' no puede estar vacío.")
+				if not altura_str:
+					raise ValueError("El campo 'Ingrese la altura' no puede estar vacío.")
+
+				base = self.validar_numero(base_str, self.txt_base, "Por favor, ingrese una base numérica válida.")
+				altura = self.validar_numero(altura_str, self.txt_altura, "Por favor, ingrese una altura numérica válida.")
+
+				if base <= 0 or altura <= 0:
+					raise ValueError("La base y la altura deben ser números positivos.")
+
 				if 'Área' in self.figura:
 					resultado = Geometria.area_triangulo(base, altura)
 				elif 'Perímetro' in self.figura:
 					resultado = Geometria.perimetro_triangulo(base, base, base)  # Triángulo equilátero
+				else:
+					raise ValueError("Operación no soportada para Triángulo.")
+
+				self.txt_resultado.SetValue(str(resultado))
+				self.txt_resultado.SetFocus()
 				self.txt_base.SetValue("")
 				self.txt_altura.SetValue("")
-			else:
-				raise ValueError("Figura no soportada.")
-			self.txt_resultado.SetValue(str(resultado))
-			self.txt_resultado.SetFocus()
+
+		except ValueError as ve:
+			wx.MessageBox(f"Error: {ve}", "Error de Validación", wx.OK | wx.ICON_ERROR)
+			self.enfocar_campo_error(ve)
 		except Exception as e:
-			wx.MessageBox(f"Error: {e}", "Error", wx.OK | wx.ICON_ERROR)
+			wx.MessageBox(f"Ha ocurrido un error inesperado: {e}", "Error", wx.OK | wx.ICON_ERROR)
+			self.SetFocus()
+
+	def validar_numero(self, valor_str, control, mensaje_error):
+		"""Valida que la cadena ingresada sea un número flotante."""
+		try:
+			valor = float(valor_str)
+			return valor
+		except ValueError:
+			raise ValueError(mensaje_error)
+
+	def enfocar_campo_error(self, error):
+		"""Enfoca el campo de entrada correspondiente según el error."""
+		error = str(error).lower()
+		if "radio" in error:
+			self.txt_radio.SetFocus()
+		elif "base" in error:
+			self.txt_base.SetFocus()
+		elif "altura" in error:
+			self.txt_altura.SetFocus()
+		else:
+			self.SetFocus()
 
 	def mostrar_ayuda(self, event):
 		"""Muestra la ayuda específica para la figura seleccionada."""
 		if 'Círculo' in self.figura:
-			mensaje = f"Ingrese el radio del círculo para calcular el {self.figura.lower()}.\nEjemplo: Para un radio de 5 unidades."
+			mensaje = ("Ingrese el radio del círculo para calcular su área o perímetro.\n"
+					   "Ejemplo: Para un radio de 5 unidades.")
 		elif 'Triángulo' in self.figura:
-			mensaje = f"Ingrese la base y la altura del triángulo para calcular el {self.figura.lower()}.\nEjemplo: Base = 4, Altura = 3."
+			mensaje = ("Ingrese la base y la altura del triángulo para calcular su área.\n"
+					   "Ejemplo: Base = 4 unidades, Altura = 3 unidades.\n"
+					   "Para calcular el perímetro de un triángulo equilátero, ingrese el mismo valor para la base tres veces.")
 		else:
 			mensaje = "Figura no soportada."
 		wx.MessageBox(mensaje, "Ayuda", wx.OK | wx.ICON_INFORMATION)
