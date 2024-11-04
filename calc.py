@@ -653,33 +653,42 @@ class DialogoAritmetica(wx.Dialog):
 		self.Destroy()
 		
 
-
 class DialogoConversion(wx.Dialog):
 	"""Diálogo para conversión de unidades."""
 	def __init__(self, parent, categoria):
-		super().__init__(parent, title=f"Conversión de {categoria}", size=(350, 400))
+		super().__init__(parent, title=f"Conversión de {categoria}", size=(400, 450))
 		self.categoria = categoria
 
 		vbox = wx.BoxSizer(wx.VERTICAL)
 
+		# Crear y añadir los elementos al sizer
+		# Primer elemento: Valor a convertir
 		lbl_valor = wx.StaticText(self, label="Valor a convertir:")
 		self.txt_valor = wx.TextCtrl(self)
+		vbox.Add(lbl_valor, flag=wx.LEFT | wx.TOP, border=10)
+		vbox.Add(self.txt_valor, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+		# Unidad de origen
 		lbl_unidad_origen = wx.StaticText(self, label="Unidad de origen:")
 		self.cmb_origen = wx.ComboBox(self, choices=self.obtener_unidades(), style=wx.CB_READONLY)
+		self.cmb_origen.SetSelection(0)  # Seleccionar el primer elemento por defecto
+		vbox.Add(lbl_unidad_origen, flag=wx.LEFT | wx.TOP, border=10)
+		vbox.Add(self.cmb_origen, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+		# Unidad de destino
 		lbl_unidad_destino = wx.StaticText(self, label="Unidad de destino:")
 		self.cmb_destino = wx.ComboBox(self, choices=self.obtener_unidades(), style=wx.CB_READONLY)
+		self.cmb_destino.SetSelection(0)  # Seleccionar el primer elemento por defecto
+		vbox.Add(lbl_unidad_destino, flag=wx.LEFT | wx.TOP, border=10)
+		vbox.Add(self.cmb_destino, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+		# Resultado
 		lbl_resultado = wx.StaticText(self, label="Resultado:")
 		self.txt_resultado = wx.TextCtrl(self, style=wx.TE_READONLY)
+		vbox.Add(lbl_resultado, flag=wx.LEFT | wx.TOP, border=10)
+		vbox.Add(self.txt_resultado, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
 
-		vbox.Add(lbl_valor, flag=wx.LEFT|wx.TOP, border=10)
-		vbox.Add(self.txt_valor, flag=wx.EXPAND|wx.LEFT|wx.RIGHT, border=10)
-		vbox.Add(lbl_unidad_origen, flag=wx.LEFT|wx.TOP, border=10)
-		vbox.Add(self.cmb_origen, flag=wx.EXPAND|wx.LEFT|wx.RIGHT, border=10)
-		vbox.Add(lbl_unidad_destino, flag=wx.LEFT|wx.TOP, border=10)
-		vbox.Add(self.cmb_destino, flag=wx.EXPAND|wx.LEFT|wx.RIGHT, border=10)
-		vbox.Add(lbl_resultado, flag=wx.LEFT|wx.TOP, border=10)
-		vbox.Add(self.txt_resultado, flag=wx.EXPAND|wx.LEFT|wx.RIGHT, border=10)
-
+		# Botones
 		hbox = wx.BoxSizer(wx.HORIZONTAL)
 		btn_calcular = wx.Button(self, label="&Calcular")
 		btn_calcular.Bind(wx.EVT_BUTTON, self.calcular)
@@ -691,9 +700,12 @@ class DialogoConversion(wx.Dialog):
 		hbox.Add(btn_ayuda, flag=wx.RIGHT, border=5)
 		hbox.Add(btn_salir)
 
-		vbox.Add(hbox, flag=wx.ALIGN_CENTER|wx.TOP|wx.BOTTOM, border=10)
+		vbox.Add(hbox, flag=wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=20)
 
 		self.SetSizer(vbox)
+
+		# Mejorar accesibilidad
+		self.txt_valor.SetFocus()
 
 	def obtener_unidades(self):
 		"""Retorna las unidades disponibles para la categoría seleccionada."""
@@ -712,17 +724,52 @@ class DialogoConversion(wx.Dialog):
 	def calcular(self, event):
 		"""Realiza la conversión de unidades."""
 		try:
-			valor = float(self.txt_valor.GetValue())
+			valor_str = self.txt_valor.GetValue().strip()
+			if not valor_str:
+				raise ValueError("El campo 'Valor a convertir' no puede estar vacío.")
+			valor = self.validar_numero(valor_str, self.txt_valor, "Por favor, ingrese un valor numérico válido.")
+
 			origen = self.cmb_origen.GetValue()
 			destino = self.cmb_destino.GetValue()
-			if not origen or not destino:
-				raise ValueError("Debe seleccionar las unidades de origen y destino.")
+
+			if not origen:
+				raise ValueError("Debe seleccionar una 'Unidad de origen'.")
+			if not destino:
+				raise ValueError("Debe seleccionar una 'Unidad de destino'.")
+
 			resultado = Conversion.convertir(valor, origen, destino, self.categoria)
 			self.txt_resultado.SetValue(str(resultado))
 			self.txt_resultado.SetFocus()
+
+			# Limpiar el campo de valor después del cálculo exitoso
 			self.txt_valor.SetValue("")
+
+		except ValueError as ve:
+			wx.MessageBox(f"Error: {ve}", "Error de Validación", wx.OK | wx.ICON_ERROR)
+			self.enfocar_campo_error(ve)
 		except Exception as e:
-			wx.MessageBox(f"Error: {e}", "Error", wx.OK | wx.ICON_ERROR)
+			wx.MessageBox(f"Ha ocurrido un error inesperado: {e}", "Error", wx.OK | wx.ICON_ERROR)
+			self.SetFocus()
+
+	def validar_numero(self, valor_str, control, mensaje_error):
+		"""Valida que la cadena ingresada sea un número flotante."""
+		try:
+			valor = float(valor_str)
+			return valor
+		except ValueError:
+			raise ValueError(mensaje_error)
+
+	def enfocar_campo_error(self, error):
+		"""Enfoca el campo de entrada correspondiente según el error."""
+		error = str(error).lower()
+		if "valor a convertir" in error:
+			self.txt_valor.SetFocus()
+		elif "unidad de origen" in error:
+			self.cmb_origen.SetFocus()
+		elif "unidad de destino" in error:
+			self.cmb_destino.SetFocus()
+		else:
+			self.SetFocus()
 
 	def mostrar_ayuda(self, event):
 		"""Muestra la ayuda para la conversión de unidades."""
