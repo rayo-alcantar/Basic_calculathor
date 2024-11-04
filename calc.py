@@ -399,11 +399,10 @@ class Calculadora(wx.Frame):
 		dialogo = DialogoEstadistica(self, operacion)
 		dialogo.ShowModal()
 		dialogo.Destroy()
-
 class DialogoAritmetica(wx.Dialog):
 	"""Diálogo para operaciones aritméticas."""
 	def __init__(self, parent, operacion):
-		super().__init__(parent, title=operacion, size=(350, 350))
+		super().__init__(parent, title=operacion, size=(400, 400))
 		self.operacion = operacion
 
 		vbox = wx.BoxSizer(wx.VERTICAL)
@@ -484,48 +483,76 @@ class DialogoAritmetica(wx.Dialog):
 		"""Realiza el cálculo de la operación seleccionada."""
 		try:
 			if self.operacion == 'Suma':
-				num1 = float(self.txt_entrada1.GetValue())
-				num2 = float(self.txt_entrada2.GetValue())
+				num1_str = self.txt_entrada1.GetValue()
+				num2_str = self.txt_entrada2.GetValue()
+				num1 = self.validar_numero(num1_str, self.txt_entrada1, "Por favor, ingrese un número válido en 'Primer número'.")
+				num2 = self.validar_numero(num2_str, self.txt_entrada2, "Por favor, ingrese un número válido en 'Segundo número'.")
 				resultado = Aritmetica.suma(num1, num2)
 			elif self.operacion == 'Resta':
-				num1 = float(self.txt_entrada1.GetValue())
-				num2 = float(self.txt_entrada2.GetValue())
+				num1_str = self.txt_entrada1.GetValue()
+				num2_str = self.txt_entrada2.GetValue()
+				num1 = self.validar_numero(num1_str, self.txt_entrada1, "Por favor, ingrese un número válido en 'Primer número'.")
+				num2 = self.validar_numero(num2_str, self.txt_entrada2, "Por favor, ingrese un número válido en 'Segundo número'.")
 				resultado = Aritmetica.resta(num1, num2)
 			elif self.operacion == 'Multiplicación':
-				num1 = float(self.txt_entrada1.GetValue())
-				num2 = float(self.txt_entrada2.GetValue())
+				num1_str = self.txt_entrada1.GetValue()
+				num2_str = self.txt_entrada2.GetValue()
+				num1 = self.validar_numero(num1_str, self.txt_entrada1, "Por favor, ingrese un número válido en 'Primer número'.")
+				num2 = self.validar_numero(num2_str, self.txt_entrada2, "Por favor, ingrese un número válido en 'Segundo número'.")
 				resultado = Aritmetica.multiplicacion(num1, num2)
 			elif self.operacion == 'División':
-				num1 = float(self.txt_entrada1.GetValue())
-				num2 = float(self.txt_entrada2.GetValue())
+				num1_str = self.txt_entrada1.GetValue()
+				num2_str = self.txt_entrada2.GetValue()
+				num1 = self.validar_numero(num1_str, self.txt_entrada1, "Por favor, ingrese un número válido en 'Primer número'.")
+				num2 = self.validar_numero(num2_str, self.txt_entrada2, "Por favor, ingrese un número válido en 'Segundo número'.")
+				if num2 == 0:
+					raise ZeroDivisionError("La división por cero no está permitida.")
 				resultado = Aritmetica.division(num1, num2)
 			elif self.operacion == 'Raíz Cuadrada':
-				num = float(self.txt_num.GetValue())
+				num_str = self.txt_num.GetValue()
+				num = self.validar_numero(num_str, self.txt_num, "Por favor, ingrese un número válido.")
+				if num < 0:
+					raise ValueError("No se puede calcular la raíz cuadrada de un número negativo.")
 				resultado = Aritmetica.raiz_cuadrada(num)
 			elif self.operacion == 'Logaritmo':
-				num = float(self.txt_num.GetValue())
+				num_str = self.txt_num.GetValue()
 				base_str = self.txt_base.GetValue()
+				num = self.validar_numero(num_str, self.txt_num, "Por favor, ingrese un número válido.")
 				if base_str:
-					base = float(base_str)
+					base = self.validar_numero(base_str, self.txt_base, "Por favor, ingrese una base válida.")
+					if base <= 0 or base == 1:
+						raise ValueError("La base del logaritmo debe ser un número positivo diferente de 1.")
 					resultado = Aritmetica.logaritmo(num, base)
 				else:
 					resultado = Aritmetica.logaritmo(num)
 			elif self.operacion == 'Porcentaje':
-				total = float(self.txt_total.GetValue())
-				porcentaje = float(self.txt_porcentaje.GetValue())
+				total_str = self.txt_total.GetValue()
+				porcentaje_str = self.txt_porcentaje.GetValue()
+				total = self.validar_numero(total_str, self.txt_total, "Por favor, ingrese un valor total válido.")
+				porcentaje = self.validar_numero(porcentaje_str, self.txt_porcentaje, "Por favor, ingrese un porcentaje válido.")
 				resultado = Aritmetica.porcentaje(total, porcentaje)
 			elif self.operacion == 'Potencia':
-				base = float(self.txt_base.GetValue())
-				exponente = float(self.txt_exponente.GetValue())
+				base_str = self.txt_base.GetValue()
+				exponente_str = self.txt_exponente.GetValue()
+				base = self.validar_numero(base_str, self.txt_base, "Por favor, ingrese una base válida.")
+				exponente = self.validar_numero(exponente_str, self.txt_exponente, "Por favor, ingrese un exponente válido.")
 				resultado = Aritmetica.potencia(base, exponente)
 			elif self.operacion == 'Expresión Matemática':
 				expresion = self.txt_expresion.GetValue()
 				variables_str = self.txt_variables.GetValue()
+				if not expresion.strip():
+					raise ValueError("La expresión matemática no puede estar vacía.")
 				variables = {}
 				if variables_str:
 					for var in variables_str.split(','):
+						if '=' not in var:
+							raise ValueError(f"Formato inválido para la variable: '{var}'. Use 'variable=valor'.")
 						key, value = var.strip().split('=')
-						variables[key.strip()] = float(value.strip())
+						key = key.strip()
+						value = value.strip()
+						if not key.isidentifier():
+							raise ValueError(f"Nombre de variable inválido: '{key}'.")
+						variables[key] = self.validar_numero(value, self.txt_variables, f"Valor inválido para la variable '{key}'.")
 				resultado = Aritmetica.expresion_matematica(expresion, variables)
 			else:
 				raise ValueError("Operación no soportada.")
@@ -533,26 +560,70 @@ class DialogoAritmetica(wx.Dialog):
 			self.txt_resultado.SetValue(str(resultado))
 			self.txt_resultado.SetFocus()
 
-			if self.operacion in ['Suma', 'Resta', 'Multiplicación', 'División']:
-				self.txt_entrada1.SetValue("")
-				self.txt_entrada2.SetValue("")
-			elif self.operacion == 'Raíz Cuadrada':
-				self.txt_num.SetValue("")
-			elif self.operacion == 'Logaritmo':
-				self.txt_num.SetValue("")
-				self.txt_base.SetValue("")
-			elif self.operacion == 'Porcentaje':
-				self.txt_total.SetValue("")
-				self.txt_porcentaje.SetValue("")
-			elif self.operacion == 'Potencia':
-				self.txt_base.SetValue("")
-				self.txt_exponente.SetValue("")
-			elif self.operacion == 'Expresión Matemática':
-				self.txt_expresion.SetValue("")
-				self.txt_variables.SetValue("")
+			# Limpiar los campos de entrada después del cálculo exitoso
+			self.limpiar_campos()
 
+		except ValueError as ve:
+			wx.MessageBox(f"Error: {ve}", "Error de Validación", wx.OK | wx.ICON_ERROR)
+			self.enfocar_campo_error(ve)
+		except ZeroDivisionError as zde:
+			wx.MessageBox(f"Error: {zde}", "Error de Cálculo", wx.OK | wx.ICON_ERROR)
+			self.enfocar_campo_error(zde)
 		except Exception as e:
-			wx.MessageBox(f"Error: {e}", "Error", wx.OK | wx.ICON_ERROR)
+			wx.MessageBox(f"Ha ocurrido un error inesperado: {e}", "Error", wx.OK | wx.ICON_ERROR)
+			self.SetFocus()
+
+	def validar_numero(self, valor_str, control, mensaje_error):
+		"""Valida que la cadena ingresada sea un número flotante."""
+		try:
+			valor = float(valor_str)
+			return valor
+		except ValueError:
+			raise ValueError(mensaje_error)
+
+	def enfocar_campo_error(self, error):
+		"""Enfoca el campo de entrada correspondiente según el error."""
+		error = str(error).lower()
+		if "primer número" in error:
+			self.txt_entrada1.SetFocus()
+		elif "segundo número" in error:
+			self.txt_entrada2.SetFocus()
+		elif "ingrese un número válido" in error:
+			self.txt_num.SetFocus()
+		elif "base" in error:
+			self.txt_base.SetFocus()
+		elif "valor total" in error:
+			self.txt_total.SetFocus()
+		elif "porcentaje" in error:
+			self.txt_porcentaje.SetFocus()
+		elif "exponente" in error:
+			self.txt_exponente.SetFocus()
+		elif "expresión matemática" in error:
+			self.txt_expresion.SetFocus()
+		elif "variable" in error:
+			self.txt_variables.SetFocus()
+		else:
+			self.SetFocus()
+
+	def limpiar_campos(self):
+		"""Limpia los campos de entrada según la operación."""
+		if self.operacion in ['Suma', 'Resta', 'Multiplicación', 'División']:
+			self.txt_entrada1.SetValue("")
+			self.txt_entrada2.SetValue("")
+		elif self.operacion == 'Raíz Cuadrada':
+			self.txt_num.SetValue("")
+		elif self.operacion == 'Logaritmo':
+			self.txt_num.SetValue("")
+			self.txt_base.SetValue("")
+		elif self.operacion == 'Porcentaje':
+			self.txt_total.SetValue("")
+			self.txt_porcentaje.SetValue("")
+		elif self.operacion == 'Potencia':
+			self.txt_base.SetValue("")
+			self.txt_exponente.SetValue("")
+		elif self.operacion == 'Expresión Matemática':
+			self.txt_expresion.SetValue("")
+			self.txt_variables.SetValue("")
 
 	def mostrar_ayuda(self, event):
 		"""Muestra la ayuda específica para la operación seleccionada."""
@@ -580,6 +651,8 @@ class DialogoAritmetica(wx.Dialog):
 	def salir(self, event):
 		"""Cierra el diálogo actual."""
 		self.Destroy()
+		
+
 
 class DialogoConversion(wx.Dialog):
 	"""Diálogo para conversión de unidades."""
