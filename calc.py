@@ -784,11 +784,12 @@ class DialogoConversion(wx.Dialog):
 class DialogoTrigonometria(wx.Dialog):
 	"""Diálogo para operaciones trigonométricas."""
 	def __init__(self, parent, funcion):
-		super().__init__(parent, title=f"Función {funcion}", size=(350, 300))
+		super().__init__(parent, title=f"Función {funcion}", size=(400, 350))
 		self.funcion = funcion
 
 		vbox = wx.BoxSizer(wx.VERTICAL)
 
+		# Ajustar los campos de entrada según la función seleccionada
 		if self.funcion in ['Seno', 'Coseno', 'Tangente']:
 			lbl_angulo = wx.StaticText(self, label="Ingrese el ángulo en grados:")
 			self.txt_angulo = wx.TextCtrl(self)
@@ -805,6 +806,7 @@ class DialogoTrigonometria(wx.Dialog):
 		vbox.Add(lbl_resultado, flag=wx.LEFT | wx.TOP, border=10)
 		vbox.Add(self.txt_resultado, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
 
+		# Botones
 		hbox = wx.BoxSizer(wx.HORIZONTAL)
 		btn_calcular = wx.Button(self, label="&Calcular")
 		btn_calcular.Bind(wx.EVT_BUTTON, self.calcular)
@@ -816,36 +818,83 @@ class DialogoTrigonometria(wx.Dialog):
 		hbox.Add(btn_ayuda, flag=wx.RIGHT, border=5)
 		hbox.Add(btn_salir)
 
-		vbox.Add(hbox, flag=wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=10)
+		vbox.Add(hbox, flag=wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=20)
 
 		self.SetSizer(vbox)
+
+		# Mejorar accesibilidad: establecer el foco en el primer campo de entrada
+		if self.funcion in ['Seno', 'Coseno', 'Tangente']:
+			self.txt_angulo.SetFocus()
+		elif self.funcion in ['Arco Seno', 'Arco Coseno', 'Arco Tangente']:
+			self.txt_valor.SetFocus()
 
 	def calcular(self, event):
 		"""Realiza el cálculo de la función trigonométrica seleccionada."""
 		try:
 			if self.funcion in ['Seno', 'Coseno', 'Tangente']:
-				angulo_grados = float(self.txt_angulo.GetValue())
+				angulo_str = self.txt_angulo.GetValue().strip()
+				if not angulo_str:
+					raise ValueError("El campo 'Ingrese el ángulo en grados' no puede estar vacío.")
+				angulo = self.validar_numero(angulo_str, self.txt_angulo, "Por favor, ingrese un ángulo numérico válido.")
+
 				if self.funcion == 'Seno':
-					resultado = Trigonometria.seno(angulo_grados)
+					resultado = Trigonometria.seno(angulo)
 				elif self.funcion == 'Coseno':
-					resultado = Trigonometria.coseno(angulo_grados)
+					resultado = Trigonometria.coseno(angulo)
 				elif self.funcion == 'Tangente':
-					resultado = Trigonometria.tangente(angulo_grados)
+					if angulo % 180 == 90:
+						raise ValueError("La tangente de 90 + k*180 grados está indefinida.")
+					resultado = Trigonometria.tangente(angulo)
+
 				self.txt_resultado.SetValue(str(resultado))
+				self.txt_resultado.SetFocus()
 				self.txt_angulo.SetValue("")
+
 			elif self.funcion in ['Arco Seno', 'Arco Coseno', 'Arco Tangente']:
-				valor = float(self.txt_valor.GetValue())
+				valor_str = self.txt_valor.GetValue().strip()
+				if not valor_str:
+					raise ValueError("El campo 'Ingrese el valor' no puede estar vacío.")
+				valor = self.validar_numero(valor_str, self.txt_valor, "Por favor, ingrese un valor numérico válido.")
+
 				if self.funcion == 'Arco Seno':
+					if valor < -1 or valor > 1:
+						raise ValueError("El valor para Arco Seno debe estar entre -1 y 1.")
 					resultado = Trigonometria.arco_seno(valor)
 				elif self.funcion == 'Arco Coseno':
+					if valor < -1 or valor > 1:
+						raise ValueError("El valor para Arco Coseno debe estar entre -1 y 1.")
 					resultado = Trigonometria.arco_coseno(valor)
 				elif self.funcion == 'Arco Tangente':
 					resultado = Trigonometria.arco_tangente(valor)
+
 				self.txt_resultado.SetValue(str(resultado))
+				self.txt_resultado.SetFocus()
 				self.txt_valor.SetValue("")
-			self.txt_resultado.SetFocus()
+
+		except ValueError as ve:
+			wx.MessageBox(f"Error: {ve}", "Error de Validación", wx.OK | wx.ICON_ERROR)
+			self.enfocar_campo_error(ve)
 		except Exception as e:
-			wx.MessageBox(f"Error: {e}", "Error", wx.OK | wx.ICON_ERROR)
+			wx.MessageBox(f"Ha ocurrido un error inesperado: {e}", "Error", wx.OK | wx.ICON_ERROR)
+			self.SetFocus()
+
+	def validar_numero(self, valor_str, control, mensaje_error):
+		"""Valida que la cadena ingresada sea un número flotante."""
+		try:
+			valor = float(valor_str)
+			return valor
+		except ValueError:
+			raise ValueError(mensaje_error)
+
+	def enfocar_campo_error(self, error):
+		"""Enfoca el campo de entrada correspondiente según el error."""
+		error = str(error).lower()
+		if "ángulo" in error:
+			self.txt_angulo.SetFocus()
+		elif "valor" in error and "arco" in self.funcion.lower():
+			self.txt_valor.SetFocus()
+		else:
+			self.SetFocus()
 
 	def mostrar_ayuda(self, event):
 		"""Muestra la ayuda específica para la función seleccionada."""
