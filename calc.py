@@ -14,7 +14,7 @@ import subprocess
 
 from operaciones import Aritmetica, Conversion, Trigonometria, CambioBases, Geometria, Quimica, Estadistica
 
-VERSION = '1.1'
+VERSION = '1.2'
 
 class Calculadora(wx.Frame):
 	"""Ventana principal de la calculadora."""
@@ -188,6 +188,7 @@ class Calculadora(wx.Frame):
 		if hasattr(self, 'progress_dialog'):
 			self.progress_dialog.Destroy()
 		wx.MessageBox(mensaje_error, "Error de descarga", wx.OK | wx.ICON_ERROR)
+
 	def crear_menu(self):
 			"""Crea el menú de opciones."""
 			menubar = wx.MenuBar()
