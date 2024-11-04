@@ -14,7 +14,7 @@ import subprocess
 
 from operaciones import Aritmetica, Conversion, Trigonometria, CambioBases, Geometria, Quimica, Estadistica
 
-VERSION = '0.4'
+VERSION = '1.0'
 
 class Calculadora(wx.Frame):
 	"""Ventana principal de la calculadora."""

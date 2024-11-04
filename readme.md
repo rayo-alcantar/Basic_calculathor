@@ -16,6 +16,8 @@ La Calculadora Básica es una aplicación escrita en Python utilizando la biblio
 
 - `calc.py`: Código fuente principal de la aplicación que contiene la interfaz gráfica y la lógica de interacción con el usuario.
 - `operaciones.py`: Módulo que contiene las clases y métodos para realizar las operaciones matemáticas y conversiones.
+- update.py: Archivo python donde se tiene la lógica de negocio del actualizador.
+- update.exe: Archivo update.py compilado.
 - `documentacion.html`: Archivo HTML con la documentación de usuario y desarrollador.
 - `README.md`: Este archivo con información sobre el proyecto.
 
@@ -52,7 +54,8 @@ Si deseas distribuir la aplicación sin necesidad de que los usuarios tengan Pyt
 Ejecuta el siguiente comando en la terminal desde el directorio donde se encuentra `calc.py`:
 
 ```bash
-pyinstaller --windowed --onedir --name basic_calculathor0.4.1 calc.py --add-data "documentacion.html;." --hidden-import=packaging
+pyinstaller --windowed --onedir --name basic_calculathor1.0 calc.py --add-data "documentacion.html;." --add-binary "update.exe;." --hidden-import=packaging
+
 ```
 
 **Nota**: Este comando es para sistemas Windows. Si estás en macOS o Linux, reemplaza `;` por `:` en la opción `--add-data`:
