@@ -913,28 +913,40 @@ class DialogoTrigonometria(wx.Dialog):
 class DialogoCambioBases(wx.Dialog):
 	"""Diálogo para cambio de bases numéricas."""
 	def __init__(self, parent):
-		super().__init__(parent, title="Cambio de Bases", size=(350, 300))
+		super().__init__(parent, title="Cambio de Bases", size=(400, 400))
+		self.categoria = "Cambio de Bases"
 
 		vbox = wx.BoxSizer(wx.VERTICAL)
 
+		# Campo para ingresar el número
 		lbl_numero = wx.StaticText(self, label="Ingrese el número:")
 		self.txt_numero = wx.TextCtrl(self)
+		vbox.Add(lbl_numero, flag=wx.LEFT | wx.TOP, border=10)
+		vbox.Add(self.txt_numero, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+		# ComboBox para seleccionar la base de origen
 		lbl_base_origen = wx.StaticText(self, label="Base de origen:")
 		self.cmb_origen = wx.ComboBox(self, choices=['2', '8', '10', '16'], style=wx.CB_READONLY)
+		if self.cmb_origen.GetCount() > 0:
+			self.cmb_origen.SetSelection(0)  # Seleccionar el primer elemento por defecto
+		vbox.Add(lbl_base_origen, flag=wx.LEFT | wx.TOP, border=10)
+		vbox.Add(self.cmb_origen, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+		# ComboBox para seleccionar la base de destino
 		lbl_base_destino = wx.StaticText(self, label="Base de destino:")
 		self.cmb_destino = wx.ComboBox(self, choices=['2', '8', '10', '16'], style=wx.CB_READONLY)
+		if self.cmb_destino.GetCount() > 0:
+			self.cmb_destino.SetSelection(0)  # Seleccionar el primer elemento por defecto
+		vbox.Add(lbl_base_destino, flag=wx.LEFT | wx.TOP, border=10)
+		vbox.Add(self.cmb_destino, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+		# Campo para mostrar el resultado
 		lbl_resultado = wx.StaticText(self, label="Resultado:")
 		self.txt_resultado = wx.TextCtrl(self, style=wx.TE_READONLY)
+		vbox.Add(lbl_resultado, flag=wx.LEFT | wx.TOP, border=10)
+		vbox.Add(self.txt_resultado, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
 
-		vbox.Add(lbl_numero, flag=wx.LEFT|wx.TOP, border=10)
-		vbox.Add(self.txt_numero, flag=wx.EXPAND|wx.LEFT|wx.RIGHT, border=10)
-		vbox.Add(lbl_base_origen, flag=wx.LEFT|wx.TOP, border=10)
-		vbox.Add(self.cmb_origen, flag=wx.EXPAND|wx.LEFT|wx.RIGHT, border=10)
-		vbox.Add(lbl_base_destino, flag=wx.LEFT|wx.TOP, border=10)
-		vbox.Add(self.cmb_destino, flag=wx.EXPAND|wx.LEFT|wx.RIGHT, border=10)
-		vbox.Add(lbl_resultado, flag=wx.LEFT|wx.TOP, border=10)
-		vbox.Add(self.txt_resultado, flag=wx.EXPAND|wx.LEFT|wx.RIGHT, border=10)
-
+		# Botones de acción
 		hbox = wx.BoxSizer(wx.HORIZONTAL)
 		btn_calcular = wx.Button(self, label="&Calcular")
 		btn_calcular.Bind(wx.EVT_BUTTON, self.calcular)
@@ -946,24 +958,70 @@ class DialogoCambioBases(wx.Dialog):
 		hbox.Add(btn_ayuda, flag=wx.RIGHT, border=5)
 		hbox.Add(btn_salir)
 
-		vbox.Add(hbox, flag=wx.ALIGN_CENTER|wx.TOP|wx.BOTTOM, border=10)
+		vbox.Add(hbox, flag=wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=20)
 
 		self.SetSizer(vbox)
+
+		# Establecer el foco en el campo de número para mejorar la accesibilidad
+		self.txt_numero.SetFocus()
 
 	def calcular(self, event):
 		"""Realiza la conversión de bases numéricas."""
 		try:
-			numero = self.txt_numero.GetValue()
-			base_origen = int(self.cmb_origen.GetValue())
-			base_destino = int(self.cmb_destino.GetValue())
-			if not numero or not self.cmb_origen.GetValue() or not self.cmb_destino.GetValue():
-				raise ValueError("Debe ingresar el número y seleccionar las bases de origen y destino.")
-			resultado = CambioBases.convertir_base(numero, base_origen, base_destino)
+			numero_str = self.txt_numero.GetValue().strip()
+			base_origen_str = self.cmb_origen.GetValue()
+			base_destino_str = self.cmb_destino.GetValue()
+
+			# Validar que los campos no estén vacíos
+			if not numero_str:
+				raise ValueError("El campo 'Ingrese el número' no puede estar vacío.")
+			if not base_origen_str:
+				raise ValueError("Debe seleccionar una 'Base de origen'.")
+			if not base_destino_str:
+				raise ValueError("Debe seleccionar una 'Base de destino'.")
+
+			base_origen = int(base_origen_str)
+			base_destino = int(base_destino_str)
+
+			# Validar que el número ingresado es válido para la base de origen
+			self.validar_numero(numero_str, base_origen)
+
+			# Realizar la conversión
+			resultado = CambioBases.convertir_base(numero_str, base_origen, base_destino)
+
+			# Mostrar el resultado
 			self.txt_resultado.SetValue(resultado)
 			self.txt_resultado.SetFocus()
+
+			# Limpiar el campo de número después del cálculo exitoso
 			self.txt_numero.SetValue("")
+
+		except ValueError as ve:
+			wx.MessageBox(f"Error: {ve}", "Error de Validación", wx.OK | wx.ICON_ERROR)
+			self.enfocar_campo_error(ve)
 		except Exception as e:
-			wx.MessageBox(f"Error: {e}", "Error", wx.OK | wx.ICON_ERROR)
+			wx.MessageBox(f"Ha ocurrido un error inesperado: {e}", "Error", wx.OK | wx.ICON_ERROR)
+			self.SetFocus()
+
+	def validar_numero(self, numero_str, base_origen):
+		"""Valida que el número ingresado sea válido para la base de origen."""
+		try:
+			# Intentar convertir el número a entero para validar su formato
+			int(numero_str, base_origen)
+		except ValueError:
+			raise ValueError(f"El número '{numero_str}' no es válido para la base {base_origen}.")
+
+	def enfocar_campo_error(self, error):
+		"""Enfoca el campo de entrada correspondiente según el error."""
+		error = str(error).lower()
+		if "ingrese el número" in error:
+			self.txt_numero.SetFocus()
+		elif "base de origen" in error:
+			self.cmb_origen.SetFocus()
+		elif "base de destino" in error:
+			self.cmb_destino.SetFocus()
+		else:
+			self.SetFocus()
 
 	def mostrar_ayuda(self, event):
 		"""Muestra la ayuda para el cambio de bases numéricas."""
