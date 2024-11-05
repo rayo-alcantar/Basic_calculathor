@@ -87,10 +87,55 @@ class Calculadora(wx.Frame):
 		threading.Thread(target=check_update).start()
 
 	def mostrar_error_zip_no_descomprimido(self):
-		"""Muestra un error indicando que el archivo zip no ha sido descomprimido."""
-		mensaje = ("Se ha detectado que hay una actualización descargada pero no descomprimida.\n"
-				   "Por favor, descomprima el archivo zip descargado para actualizar a la última versión.")
+		"""Muestra un error indicando que el archivo zip no ha sido descomprimido y abre la carpeta del programa."""
+		
+		# Mensaje de error que se mostrará al usuario
+		mensaje = (
+			"Se ha detectado que hay una actualización descargada pero no descomprimida.\n"
+			"Por favor, descomprima el archivo zip descargado para actualizar a la última versión."
+		)
+		
+		# Mostrar el cuadro de mensaje de error de manera modal
 		wx.MessageBox(mensaje, "Actualización pendiente", wx.OK | wx.ICON_ERROR)
+		
+		try:
+			# Determinar la ruta del ejecutable o del script
+			if getattr(sys, 'frozen', False):
+				# La aplicación está empaquetada como un ejecutable (.exe) usando PyInstaller u otra herramienta similar
+				ruta_ejecutable = os.path.dirname(sys.executable)
+			else:
+				# La aplicación se está ejecutando como un script de Python
+				ruta_ejecutable = os.path.dirname(os.path.abspath(__file__))
+			
+			# Verificar que la ruta existe
+			if not os.path.exists(ruta_ejecutable):
+				raise FileNotFoundError(f"La ruta {ruta_ejecutable} no existe.")
+			
+			# Abrir la carpeta en el explorador de archivos según el sistema operativo
+			if sys.platform.startswith('win'):
+				# Windows
+				os.startfile(ruta_ejecutable)
+			elif sys.platform.startswith('darwin'):
+				# macOS
+				subprocess.Popen(['open', ruta_ejecutable])
+			elif sys.platform.startswith('linux'):
+				# Linux
+				subprocess.Popen(['xdg-open', ruta_ejecutable])
+			else:
+				# Otros sistemas operativos no soportados
+				wx.MessageBox(
+					"Sistema operativo no soportado para abrir la carpeta automáticamente.",
+					"Error",
+					wx.OK | wx.ICON_ERROR
+				)
+		
+		except Exception as e:
+			# Mostrar un mensaje de error si ocurre alguna excepción al intentar abrir la carpeta
+			wx.MessageBox(
+				f"Error al abrir la carpeta del programa: {e}",
+				"Error",
+				wx.OK | wx.ICON_ERROR
+			)
 
 	def notificar_nueva_version(self, ultima_version, url_asset, asset_name):
 		"""Notifica al usuario que hay una nueva versión y ofrece descargarla."""
