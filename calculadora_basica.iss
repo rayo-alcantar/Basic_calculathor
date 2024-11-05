@@ -1,11 +1,11 @@
 ; Script generado por el Asistente de Inno Setup.
 ; ¡Consulta la documentación para obtener detalles sobre cómo crear archivos de script de Inno Setup!
 
-#define MyAppName "basic_calculathor"
+#define MyAppName "Calculadora básica"
 #define MyAppVersion "1.1"
 #define MyAppPublisher "Rayoscompany"
 #define MyAppURL "https://rayoscompany.com"
-#define MyAppExeName "basic_calculathor1.1.exe"
+#define MyAppExeName "basic_calculathor.exe"
 [Setup]
 ; El valor de AppId identifica de forma única esta aplicación. No utilices el mismo valor de AppId en instaladores para otras aplicaciones.
 ; (Para generar un nuevo GUID, haz clic en Herramientas | Generar GUID en el IDE.)
@@ -19,12 +19,14 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 
 ; Configurar la carpeta de instalación en el directorio local del usuario
-DefaultDirName={localappdata}\{#MyAppName}{#MyAppVersion}
+DefaultDirName={localappdata}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 CreateAppDir=yes
 
 ; Mostrar información antes de la instalación
-InfoBeforeFile={app}\documentacion.html
+InfoBeforeFile=C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.1\_internal\documentacion.html
+
+
 
 ; Requerir privilegios mínimos (no requiere administrador)
 PrivilegesRequired=lowest
@@ -32,7 +34,7 @@ PrivilegesRequiredOverridesAllowed=dialog
 
 ; Configuración de salida del instalador
 OutputDir=calculadoraBasicaInstaller
-OutputBaseFilename=calculadora_básica_installer
+OutputBaseFilename=calculadoraBasicaInstaller
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -43,13 +45,15 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 ; Copiar el ejecutable principal
-Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.1\calc.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.1\basic_calculathor.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 ; Copiar el actualizador
 Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.1\update.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 ; Copiar la documentación
-Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.1\documentacion.html"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.1\_internal\documentacion.html"; DestDir: "{app}"; Flags: ignoreversion
+; Copiar toda la carpeta "_internal" con su contenido
+Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.1\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; Nota: No utilices "Flags: ignoreversion" en archivos de sistema compartidos
 
