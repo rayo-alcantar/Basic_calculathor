@@ -1,5 +1,6 @@
 ﻿# operaciones.py
 import math
+import re
 import sympy as sp
 from collections import Counter
 
@@ -263,45 +264,65 @@ class Quimica:
 	def calcular_masa_molar(compuesto):
 		"""
 		Calcula la masa molar de un compuesto dado su fórmula química.
-		
+
 		Parámetros:
 			compuesto (str): Fórmula química del compuesto (por ejemplo, 'H2O', 'C6H12O6')
-		
+
 		Retorna:
 			float: Masa molar en gramos/mol
+
+		Nota:
+			Se utiliza una expresión regular para identificar correctamente elementos de una o dos letras.
 		"""
-		# Diccionario de masas atómicas (g/mol) para elementos comunes
+		# Diccionario ampliado de masas atómicas (g/mol) para elementos comunes
 		masas_atomicas = {
 			'H': 1.008,
+			'He': 4.0026,
+			'Li': 6.94,
+			'Be': 9.0122,
+			'B': 10.81,
 			'C': 12.011,
 			'N': 14.007,
 			'O': 15.999,
+			'F': 18.998,
+			'Ne': 20.180,
+			'Na': 22.990,
+			'Mg': 24.305,
+			'Al': 26.982,
+			'Si': 28.085,
 			'P': 30.974,
 			'S': 32.06,
 			'Cl': 35.45,
-			# Agrega más elementos según sea necesario
+			'Ar': 39.948,
+			'K': 39.098,
+			'Ca': 40.078,
+			'Fe': 55.845,
+			# Se pueden agregar más elementos según se requiera
 		}
-		import re
-		# Expresión regular para analizar la fórmula química
+		
+		# Expresión regular para analizar la fórmula química: un elemento comienza con letra mayúscula, 
+		# puede ir seguido de una minúscula opcional, y un número opcional que indica la cantidad.
 		patron = r'([A-Z][a-z]?)(\d*)'
 		componentes = re.findall(patron, compuesto)
 		masa_molar = 0.0
+		
 		for (elemento, cantidad) in componentes:
 			if elemento not in masas_atomicas:
 				raise ValueError(f"Elemento '{elemento}' no reconocido.")
-			cantidad = int(cantidad) if cantidad else 1
-			masa_molar += masas_atomicas[elemento] * cantidad
+			cantidad_valor = int(cantidad) if cantidad else 1
+			masa_molar += masas_atomicas[elemento] * cantidad_valor
+		
 		return masa_molar
 
 	@staticmethod
 	def convertir_masa_a_moles(masa, masa_molar):
 		"""
 		Convierte una masa en gramos a moles utilizando la masa molar.
-		
+
 		Parámetros:
 			masa (float): Masa en gramos.
 			masa_molar (float): Masa molar del compuesto en gramos/mol.
-		
+
 		Retorna:
 			float: Cantidad de moles.
 		"""
@@ -313,10 +334,10 @@ class Quimica:
 	def calcular_numero_particulas(moles):
 		"""
 		Calcula el número de partículas a partir de moles usando el número de Avogadro.
-		
+
 		Parámetros:
 			moles (float): Cantidad de moles.
-		
+
 		Retorna:
 			float: Número de partículas.
 		"""
@@ -327,11 +348,12 @@ class Quimica:
 	def energia_enlace(enlaces, energias_enlace):
 		"""
 		Calcula la energía total de enlaces en una molécula.
-		
+
 		Parámetros:
-			enlaces (dict): Diccionario con tipos de enlace y cantidad (e.g., {'C-H': 4, 'C=C': 1})
+			enlaces (dict): Diccionario con tipos de enlace y cantidad 
+							(por ejemplo, {'C-H': 4, 'C=C': 1})
 			energias_enlace (dict): Energías de enlace para cada tipo en kJ/mol
-		
+
 		Retorna:
 			float: Energía total en kJ/mol
 		"""
@@ -346,11 +368,11 @@ class Quimica:
 	def calcular_concentracion_molar(n_moles, volumen_litros):
 		"""
 		Calcula la concentración molar de una solución.
-		
+
 		Parámetros:
 			n_moles (float): Número de moles del soluto.
 			volumen_litros (float): Volumen de la solución en litros.
-		
+
 		Retorna:
 			float: Concentración en mol/L.
 		"""
@@ -362,37 +384,40 @@ class Quimica:
 	def calcular_pH(concentracion_hidrogeniones):
 		"""
 		Calcula el pH de una solución dada la concentración de iones H+.
-		
+
 		Parámetros:
 			concentracion_hidrogeniones (float): Concentración de H+ en mol/L.
-		
+
 		Retorna:
 			float: Valor de pH.
 		"""
 		if concentracion_hidrogeniones <= 0:
 			raise ValueError("La concentración debe ser positiva.")
-		return -math.log10(concentracion_hidrogeniones)
+		pH = -math.log10(concentracion_hidrogeniones)
+		return pH
 
 	@staticmethod
 	def ley_gases_ideales(P=None, V=None, n=None, T=None):
 		"""
 		Calcula una variable desconocida usando la ley de los gases ideales PV = nRT.
 		Proporcione tres de las cuatro variables; la cuarta será calculada.
-		
+
 		Parámetros:
 			P (float): Presión en atmósferas.
 			V (float): Volumen en litros.
 			n (float): Número de moles.
 			T (float): Temperatura en Kelvin.
-		
+
 		Retorna:
 			float: Valor de la variable desconocida.
 		"""
 		R = 0.082057  # Constante de los gases ideales en L·atm/(mol·K)
 		variables = {'P': P, 'V': V, 'n': n, 'T': T}
 		variables_proporcionadas = {k: v for k, v in variables.items() if v is not None}
+		
 		if len(variables_proporcionadas) != 3:
 			raise ValueError("Proporcione exactamente tres variables.")
+		
 		if P is None:
 			return (n * R * T) / V
 		elif V is None:
@@ -408,40 +433,41 @@ class Quimica:
 	def calcular_constante_equilibrio(productos, reactivos):
 		"""
 		Calcula la constante de equilibrio Kc para una reacción química.
-		
+
 		Parámetros:
 			productos (dict): Concentraciones molares de los productos {compuesto: concentración}.
 			reactivos (dict): Concentraciones molares de los reactivos {compuesto: concentración}.
-		
+
 		Retorna:
 			float: Constante de equilibrio Kc.
 		"""
-		Kc_productos = 1
-		Kc_reactivos = 1
+		Kc_productos = 1.0
+		Kc_reactivos = 1.0
 		for conc in productos.values():
 			Kc_productos *= conc
 		for conc in reactivos.values():
 			Kc_reactivos *= conc
+		
 		if Kc_reactivos == 0:
 			raise ValueError("La concentración de reactivos no puede ser cero.")
+		
 		return Kc_productos / Kc_reactivos
 
 	@staticmethod
 	def calcular_rendimiento_porcentual(rendimiento_real, rendimiento_teorico):
 		"""
 		Calcula el rendimiento porcentual de una reacción química.
-		
+
 		Parámetros:
 			rendimiento_real (float): Cantidad obtenida experimentalmente.
 			rendimiento_teorico (float): Cantidad teórica esperada.
-		
+
 		Retorna:
 			float: Rendimiento porcentual.
 		"""
 		if rendimiento_teorico == 0:
 			raise ValueError("El rendimiento teórico no puede ser cero.")
 		return (rendimiento_real / rendimiento_teorico) * 100
-
 
 class Estadistica:
 	"""Clase para operaciones estadísticas básicas y avanzadas."""
