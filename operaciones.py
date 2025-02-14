@@ -1,10 +1,7 @@
 ﻿# operaciones.py
 import math
 import re
-import sympy as sp
 from collections import Counter
-
-
 
 class Aritmetica:
 	"""Clase para operaciones aritméticas básicas."""
@@ -53,7 +50,15 @@ class Aritmetica:
 
 	@staticmethod
 	def expresion_matematica(expresion, variables):
-		return sp.sympify(expresion).evalf(subs=variables)
+		# Evaluación de la expresión matemática utilizando eval en un entorno controlado.
+		allowed_names = {}
+		allowed_names.update(math.__dict__)
+		allowed_names.update(variables)
+		try:
+			result = eval(expresion, {"__builtins__": None}, allowed_names)
+		except Exception as e:
+			raise ValueError("Expresión inválida: " + str(e))
+		return result
 
 class Conversion:
 	"""Clase para conversiones de unidades."""
@@ -511,8 +516,8 @@ class Estadistica:
 		n = len(lista)
 		if n < 2 and not poblacional:
 			raise ValueError("La varianza muestral requiere al menos dos datos.")
-		media = Estadistica.media(lista)
-		suma_cuadrados = sum((x - media) ** 2 for x in lista)
+		media_val = Estadistica.media(lista)
+		suma_cuadrados = sum((x - media_val) ** 2 for x in lista)
 		if poblacional:
 			return suma_cuadrados / n
 		else:
@@ -521,8 +526,8 @@ class Estadistica:
 	@staticmethod
 	def desviacion_estandar(lista, poblacional=False):
 		"""Calcula la desviación estándar de una lista de números."""
-		varianza = Estadistica.varianza(lista, poblacional)
-		return math.sqrt(varianza)
+		var = Estadistica.varianza(lista, poblacional)
+		return math.sqrt(var)
 
 	@staticmethod
 	def percentil(lista, percentil):
@@ -570,9 +575,9 @@ class Estadistica:
 		n = len(lista)
 		if n < 3:
 			raise ValueError("Se requieren al menos tres datos para calcular el coeficiente de asimetría.")
-		media = Estadistica.media(lista)
+		media_val = Estadistica.media(lista)
 		desviacion = Estadistica.desviacion_estandar(lista, poblacional=True)
-		suma_cubos = sum((x - media) ** 3 for x in lista)
+		suma_cubos = sum((x - media_val) ** 3 for x in lista)
 		skewness = (n / ((n - 1) * (n - 2))) * (suma_cubos / (desviacion ** 3))
 		return skewness
 
@@ -584,9 +589,9 @@ class Estadistica:
 		n = len(lista)
 		if n < 4:
 			raise ValueError("Se requieren al menos cuatro datos para calcular la curtosis.")
-		media = Estadistica.media(lista)
+		media_val = Estadistica.media(lista)
 		desviacion = Estadistica.desviacion_estandar(lista, poblacional=True)
-		suma_cuartos = sum((x - media) ** 4 for x in lista)
+		suma_cuartos = sum((x - media_val) ** 4 for x in lista)
 		kurtosis = ((n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))) * (suma_cuartos / (desviacion ** 4))
 		kurtosis -= (3 * (n - 1) ** 2) / ((n - 2) * (n - 3))
 		return kurtosis
