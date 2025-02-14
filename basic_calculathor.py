@@ -3,7 +3,7 @@ import wx
 import webbrowser
 import sys
 import requests
-import sympy as sp
+
 from packaging import version
 
 import os
