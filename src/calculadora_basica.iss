@@ -24,7 +24,7 @@ DefaultGroupName={#MyAppName}
 CreateAppDir=yes
 
 ; Mostrar información antes de la instalación
-InfoBeforeFile=C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.3\basic_calculathor\_internal\documentacion.html
+InfoBeforeFile=C:\Users\angel\OneDrive\git\calculadora\src\dist\basic_calculathor1.3\basic_calculathor\_internal\documentacion.html
 
 
 
@@ -45,15 +45,15 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 ; Copiar el ejecutable principal
-Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.3\basic_calculathor\basic_calculathor.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\angel\OneDrive\git\calculadora\src\dist\basic_calculathor1.3\basic_calculathor\basic_calculathor.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 ; Copiar el actualizador
-Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.3\basic_calculathor\update.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\angel\OneDrive\git\calculadora\src\dist\basic_calculathor1.3\basic_calculathor\update.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 ; Copiar la documentación
-Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.3\basic_calculathor\_internal\documentacion.html"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\angel\OneDrive\git\calculadora\src\dist\basic_calculathor1.3\basic_calculathor\_internal\documentacion.html"; DestDir: "{app}"; Flags: ignoreversion
 ; Copiar toda la carpeta "_internal" con su contenido
-Source: "C:\Users\angel\OneDrive\git\calculadora\dist\basic_calculathor1.3\basic_calculathor\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\angel\OneDrive\git\calculadora\src\dist\basic_calculathor1.3\basic_calculathor\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; Nota: No utilices "Flags: ignoreversion" en archivos de sistema compartidos
 

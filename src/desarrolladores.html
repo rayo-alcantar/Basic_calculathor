@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Documentación Técnica - Calculadora Básica</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: #0056b3;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+        p, li {
+            font-size: 16px;
+        }
+        code {
+            background-color: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        }
+        .code-block {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+        a {
+            color: #0056b3;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Documentación Técnica para Desarrolladores</h1>
+        <p>Esta guía está destinada a quienes deseen contribuir al desarrollo de la Calculadora Básica, entender su arquitectura o añadir nuevas funcionalidades.</p>
+
+        <h2>Obtener el Código Fuente</h2>
+        <p>El proyecto está alojado en GitHub. Puedes clonar o descargar el repositorio desde aquí: 
+            <a href="https://github.com/rayo-alcantar/Basic_calculathor" target="_blank">rayo-alcantar/Basic_calculathor</a>
+        </p>
+
+        <h2>Estructura del Proyecto</h2>
+        <p>La aplicación está desarrollada en Python con la biblioteca gráfica wxPython. Los archivos clave son:</p>
+        <ul>
+            <li><code>src/basic_calculathor.py</code>: Contiene la lógica de la interfaz de usuario (UI), la gestión de eventos y la interacción con el usuario.</li>
+            <li><code>src/operaciones.py</code>: Alberga las clases y funciones que realizan todos los cálculos matemáticos y lógicos.</li>
+            <li><code>src/calculadora_basica.iss</code>: Script de Inno Setup para crear el instalador de Windows.</li>
+            <li><code>update.py</code>: Script para gestionar las actualizaciones automáticas de la aplicación.</li>
+        </ul>
+
+        <h2>Arquitectura</h2>
+        <p>La aplicación sigue un diseño modular que separa la interfaz de usuario de la lógica de negocio:</p>
+        <ul>
+            <li><strong>Capa de Presentación (basic_calculathor.py):</strong> Responsable de todos los elementos visuales, ventanas de diálogo y eventos de usuario.</li>
+            <li><strong>Capa de Lógica de Negocio (operaciones.py):</strong> Contiene la implementación pura de las operaciones, sin depender de la interfaz gráfica.</li>
+        </ul>
+        <p>Esta separación facilita el mantenimiento, las pruebas y la escalabilidad del proyecto.</p>
+
+        <h2>Cómo Añadir Nuevas Operaciones</h2>
+        <p>Para extender la funcionalidad de la calculadora, sigue estos pasos:</p>
+        <ol>
+            <li>
+                <strong>Implementa la lógica:</strong> En <code>operaciones.py</code>, añade una nueva función o una clase que contenga el algoritmo de tu nueva operación. Asegúrate de que esté bien documentada y probada.
+            </li>
+            <li>
+                <strong>Crea la interfaz de usuario:</strong> En <code>basic_calculathor.py</code>, diseña una nueva ventana de diálogo (<code>wx.Dialog</code>) para la operación. Sigue el estilo de las existentes, como <code>DialogoAritmetica</code>.
+                <div class="code-block">
+                    <code>
+# Ejemplo de una nueva clase de diálogo
+class MiNuevoDialogo(wx.Dialog):
+    def __init__(self, parent):
+        super(MiNuevoDialogo, self).__init__(parent, title="Mi Nueva Operación")
+        # ... aquí va el código para añadir campos de entrada y botones ...
+                    </code>
+                </div>
+            </li>
+            <li>
+                <strong>Integra la operación:</strong>
+                <ul>
+                    <li>Añade la nueva operación al menú principal en <code>basic_calculathor.py</code> para que los usuarios puedan seleccionarla.</li>
+                    <li>En el evento del botón "Calcular" de tu nuevo diálogo, llama a la función correspondiente que creaste en <code>operaciones.py</code> y muestra el resultado.</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h2>Contacto</h2>
+        <p>Desarrollado por Ángel Alcantar. Puedes encontrar más de mi trabajo en mi 
+            <a href="https://github.com/rayo-alcantar" target="_blank">perfil de GitHub</a>.
+        </p>
+    </div>
+</body>
+</html>
