@@ -1,8 +1,18 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_all
+import os
 
-datas = [('documentacion.html', '.')]
-binaries = [('update.exe', '.')]
+# Archivos de datos a incluir
+datas = [
+    ('documentacion.html', '.'),
+    ('version.py', '.'),
+]
+
+# Binarios - update.exe es opcional (puede no existir aún)
+binaries = []
+if os.path.exists('update.exe'):
+    binaries.append(('update.exe', '.'))
+
 hiddenimports = ['packaging', 'wx', 'requests', 'pythoncom', 'win32com', 'win32com.client']
 tmp_ret = collect_all('sympy')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]

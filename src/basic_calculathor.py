@@ -13,8 +13,7 @@ import subprocess
 
 
 from operaciones import Aritmetica, Conversion, Trigonometria, CambioBases, Geometria, Quimica, Estadistica
-
-VERSION = '1.3'
+from version import VERSION
 
 class Calculadora(wx.Frame):
 	"""Ventana principal de la calculadora."""
@@ -483,7 +482,53 @@ class Calculadora(wx.Frame):
 		dialogo = DialogoEstadistica(self, operacion)
 		dialogo.ShowModal()
 		dialogo.Destroy()
-class DialogoAritmetica(wx.Dialog):
+
+# =============================================================================
+# CLASE BASE PARA DIÁLOGOS
+# =============================================================================
+
+class DialogoBase(wx.Dialog):
+	"""
+	Clase base para todos los diálogos de la calculadora.
+	Proporciona funcionalidad común como cierre con Escape y validación.
+	"""
+	
+	def __init__(self, parent, title="", size=(450, 400)):
+		super().__init__(parent, title=title, size=size)
+		# Vincular tecla Escape para cerrar el diálogo
+		self.Bind(wx.EVT_CHAR_HOOK, self._on_key_press)
+	
+	def _on_key_press(self, event):
+		"""Maneja pulsaciones de teclas. Cierra el diálogo con Escape."""
+		if event.GetKeyCode() == wx.WXK_ESCAPE:
+			self.Close()
+		else:
+			event.Skip()
+	
+	def validar_numero(self, valor_str, control, mensaje_error):
+		"""Valida que una cadena sea un número flotante válido."""
+		try:
+			return float(valor_str)
+		except ValueError:
+			raise ValueError(mensaje_error)
+	
+	def mostrar_error(self, mensaje, titulo="Error"):
+		"""Muestra un mensaje de error."""
+		wx.MessageBox(f"Error: {mensaje}", titulo, wx.OK | wx.ICON_ERROR)
+	
+	def mostrar_info(self, mensaje, titulo="Información"):
+		"""Muestra un mensaje informativo."""
+		wx.MessageBox(mensaje, titulo, wx.OK | wx.ICON_INFORMATION)
+	
+	def salir(self, event=None):
+		"""Cierra el diálogo actual."""
+		self.Destroy()
+
+# =============================================================================
+# DIÁLOGOS DE OPERACIONES
+# =============================================================================
+
+class DialogoAritmetica(DialogoBase):
 	"""Diálogo para operaciones aritméticas."""
 	def __init__(self, parent, operacion):
 		super().__init__(parent, title=operacion, size=(400, 400))
@@ -737,7 +782,7 @@ class DialogoAritmetica(wx.Dialog):
 		self.Destroy()
 		
 
-class DialogoConversion(wx.Dialog):
+class DialogoConversion(DialogoBase):
 	"""Diálogo para conversión de unidades."""
 	def __init__(self, parent, categoria):
 		super().__init__(parent, title=f"Conversión de {categoria}", size=(400, 450))
@@ -865,7 +910,7 @@ class DialogoConversion(wx.Dialog):
 		"""Cierra el diálogo actual."""
 		self.Destroy()
 
-class DialogoTrigonometria(wx.Dialog):
+class DialogoTrigonometria(DialogoBase):
 	"""Diálogo para operaciones trigonométricas."""
 	def __init__(self, parent, funcion):
 		super().__init__(parent, title=f"Función {funcion}", size=(450, 400))
@@ -1098,7 +1143,7 @@ class DialogoTrigonometria(wx.Dialog):
 		"""Cierra el diálogo actual."""
 		self.Destroy()
 
-class DialogoCambioBases(wx.Dialog):
+class DialogoCambioBases(DialogoBase):
 	"""Diálogo para cambio de bases numéricas."""
 	def __init__(self, parent):
 		super().__init__(parent, title="Cambio de Bases", size=(400, 400))
@@ -1221,7 +1266,7 @@ class DialogoCambioBases(wx.Dialog):
 		"""Cierra el diálogo actual."""
 		self.Destroy()
 
-class DialogoGeometria(wx.Dialog):
+class DialogoGeometria(DialogoBase):
 	"""Diálogo para operaciones geométricas."""
 	def __init__(self, parent, figura):
 		super().__init__(parent, title=figura, size=(450, 400))
@@ -1365,7 +1410,7 @@ class DialogoGeometria(wx.Dialog):
 		"""Cierra el diálogo actual."""
 		self.Destroy()
 
-class DialogoQuimica(wx.Dialog):
+class DialogoQuimica(DialogoBase):
 	"""Diálogo para operaciones químicas."""
 	def __init__(self, parent, operacion):
 		super().__init__(parent, title=operacion, size=(450, 500))
@@ -1662,7 +1707,7 @@ class DialogoQuimica(wx.Dialog):
 		except Exception:
 			raise ValueError("Formato incorrecto. Use el formato clave=valor, separado por comas.")
 
-class DialogoEstadistica(wx.Dialog):
+class DialogoEstadistica(DialogoBase):
 	"""Diálogo para operaciones estadísticas."""
 	def __init__(self, parent, operacion):
 		super().__init__(parent, title=operacion, size=(500, 600))
