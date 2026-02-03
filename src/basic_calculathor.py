@@ -396,7 +396,12 @@ class Calculadora(wx.Frame):
 
 	def operaciones_trigonometricas(self):
 		"""Despliega las funciones trigonométricas disponibles."""
-		funciones = ['Seno', 'Coseno', 'Tangente', 'Arco Seno', 'Arco Coseno', 'Arco Tangente']
+		funciones = [
+			'Seno', 'Coseno', 'Tangente', 
+			'Arco Seno', 'Arco Coseno', 'Arco Tangente',
+			'Decimal a Grados, Minutos y Segundos',
+			'Grados, Minutos y Segundos a Decimal'
+		]
 		dlg = wx.SingleChoiceDialog(self, 'Seleccione una función trigonométrica:', 'Trigonometría', funciones)
 		if dlg.ShowModal() == wx.ID_OK:
 			funcion = dlg.GetStringSelection()
@@ -863,7 +868,7 @@ class DialogoConversion(wx.Dialog):
 class DialogoTrigonometria(wx.Dialog):
 	"""Diálogo para operaciones trigonométricas."""
 	def __init__(self, parent, funcion):
-		super().__init__(parent, title=f"Función {funcion}", size=(400, 350))
+		super().__init__(parent, title=f"Función {funcion}", size=(450, 400))
 		self.funcion = funcion
 
 		vbox = wx.BoxSizer(wx.VERTICAL)
@@ -879,6 +884,34 @@ class DialogoTrigonometria(wx.Dialog):
 			self.txt_valor = wx.TextCtrl(self)
 			vbox.Add(lbl_valor, flag=wx.LEFT | wx.TOP, border=10)
 			vbox.Add(self.txt_valor, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+		elif self.funcion == 'Decimal a Grados, Minutos y Segundos':
+			# Interfaz clara para convertir decimal a sexagesimal
+			lbl_explicacion = wx.StaticText(self, label="Convierte un ángulo en formato decimal (ejemplo: 45.5125°)\na formato Grados, Minutos y Segundos (ejemplo: 45° 30' 45\").")
+			vbox.Add(lbl_explicacion, flag=wx.LEFT | wx.TOP | wx.RIGHT, border=10)
+			
+			lbl_decimal = wx.StaticText(self, label="Ingresa el ángulo en grados decimales:")
+			self.txt_decimal = wx.TextCtrl(self)
+			vbox.Add(lbl_decimal, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_decimal, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+		elif self.funcion == 'Grados, Minutos y Segundos a Decimal':
+			# Interfaz clara para convertir sexagesimal a decimal
+			lbl_explicacion = wx.StaticText(self, label="Convierte un ángulo en formato Grados, Minutos y Segundos\n(ejemplo: 45° 30' 45\") a formato decimal (ejemplo: 45.5125°).")
+			vbox.Add(lbl_explicacion, flag=wx.LEFT | wx.TOP | wx.RIGHT, border=10)
+			
+			lbl_grados = wx.StaticText(self, label="Grados (°):")
+			self.txt_grados = wx.TextCtrl(self)
+			vbox.Add(lbl_grados, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_grados, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+			
+			lbl_minutos = wx.StaticText(self, label="Minutos (') - debe ser entre 0 y 59:")
+			self.txt_minutos = wx.TextCtrl(self)
+			vbox.Add(lbl_minutos, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_minutos, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+			
+			lbl_segundos = wx.StaticText(self, label="Segundos (\") - debe ser entre 0 y 59.99:")
+			self.txt_segundos = wx.TextCtrl(self)
+			vbox.Add(lbl_segundos, flag=wx.LEFT | wx.TOP, border=10)
+			vbox.Add(self.txt_segundos, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
 
 		lbl_resultado = wx.StaticText(self, label="Resultado:")
 		self.txt_resultado = wx.TextCtrl(self, style=wx.TE_READONLY)
@@ -906,6 +939,10 @@ class DialogoTrigonometria(wx.Dialog):
 			self.txt_angulo.SetFocus()
 		elif self.funcion in ['Arco Seno', 'Arco Coseno', 'Arco Tangente']:
 			self.txt_valor.SetFocus()
+		elif self.funcion == 'Decimal a Grados, Minutos y Segundos':
+			self.txt_decimal.SetFocus()
+		elif self.funcion == 'Grados, Minutos y Segundos a Decimal':
+			self.txt_grados.SetFocus()
 
 	def calcular(self, event):
 		"""Realiza el cálculo de la función trigonométrica seleccionada."""
@@ -950,6 +987,48 @@ class DialogoTrigonometria(wx.Dialog):
 				self.txt_resultado.SetFocus()
 				self.txt_valor.SetValue("")
 
+			elif self.funcion == 'Decimal a Grados, Minutos y Segundos':
+				decimal_str = self.txt_decimal.GetValue().strip()
+				if not decimal_str:
+					raise ValueError("El campo de grados decimales no puede estar vacío.")
+				grados_decimales = self.validar_numero(decimal_str, self.txt_decimal, "Por favor, ingresa un número válido (ejemplo: 45.5125).")
+				
+				# Llamar al método de conversión
+				grados, minutos, segundos, texto_formateado = Trigonometria.decimal_a_dms(grados_decimales)
+				self.txt_resultado.SetValue(texto_formateado)
+				self.txt_resultado.SetFocus()
+				self.txt_decimal.SetValue("")
+
+			elif self.funcion == 'Grados, Minutos y Segundos a Decimal':
+				grados_str = self.txt_grados.GetValue().strip()
+				minutos_str = self.txt_minutos.GetValue().strip()
+				segundos_str = self.txt_segundos.GetValue().strip()
+				
+				if not grados_str:
+					raise ValueError("El campo de grados no puede estar vacío.")
+				if not minutos_str:
+					raise ValueError("El campo de minutos no puede estar vacío.")
+				if not segundos_str:
+					raise ValueError("El campo de segundos no puede estar vacío.")
+				
+				grados = self.validar_numero(grados_str, self.txt_grados, "Por favor, ingresa un número válido para los grados.")
+				minutos = self.validar_numero(minutos_str, self.txt_minutos, "Por favor, ingresa un número válido para los minutos.")
+				segundos = self.validar_numero(segundos_str, self.txt_segundos, "Por favor, ingresa un número válido para los segundos.")
+				
+				# Validar rangos
+				if minutos < 0 or minutos >= 60:
+					raise ValueError("Los minutos deben estar entre 0 y 59.")
+				if segundos < 0 or segundos >= 60:
+					raise ValueError("Los segundos deben estar entre 0 y 59.99.")
+				
+				# Llamar al método de conversión
+				resultado_decimal = Trigonometria.dms_a_decimal(int(grados), int(minutos), segundos)
+				self.txt_resultado.SetValue(f"{resultado_decimal}°")
+				self.txt_resultado.SetFocus()
+				self.txt_grados.SetValue("")
+				self.txt_minutos.SetValue("")
+				self.txt_segundos.SetValue("")
+
 		except ValueError as ve:
 			wx.MessageBox(f"Error: {ve}", "Error de Validación", wx.OK | wx.ICON_ERROR)
 			self.enfocar_campo_error(ve)
@@ -972,6 +1051,14 @@ class DialogoTrigonometria(wx.Dialog):
 			self.txt_angulo.SetFocus()
 		elif "valor" in error and "arco" in self.funcion.lower():
 			self.txt_valor.SetFocus()
+		elif "grados decimales" in error or "decimal" in error:
+			self.txt_decimal.SetFocus()
+		elif "grados" in error:
+			self.txt_grados.SetFocus()
+		elif "minutos" in error:
+			self.txt_minutos.SetFocus()
+		elif "segundos" in error:
+			self.txt_segundos.SetFocus()
 		else:
 			self.SetFocus()
 
@@ -981,6 +1068,28 @@ class DialogoTrigonometria(wx.Dialog):
 			mensaje = f"Ingrese el ángulo en grados para calcular el {self.funcion.lower()}.\nEjemplo: Para calcular el seno de 30 grados, ingrese 30."
 		elif self.funcion in ['Arco Seno', 'Arco Coseno', 'Arco Tangente']:
 			mensaje = f"Ingrese el valor para calcular el {self.funcion.lower()}.\nEjemplo: Para calcular el arco seno de 0.5, ingrese 0.5."
+		elif self.funcion == 'Decimal a Grados, Minutos y Segundos':
+			mensaje = ("¡Hola! Esta función convierte ángulos de formato decimal a sexagesimal.\n\n"
+					   "¿Qué significa esto?\n"
+					   "- Formato decimal: 45.5125° (un solo número con decimales)\n"
+					   "- Formato sexagesimal: 45° 30' 45\" (grados, minutos y segundos)\n\n"
+					   "¿Cómo usarla?\n"
+					   "1. Escribe el ángulo en grados decimales (ejemplo: 45.5125)\n"
+					   "2. Presiona Calcular\n"
+					   "3. El resultado aparecerá como: 45° 30' 45.0\"\n\n"
+					   "Ejemplo: Si tienes 30.5°, obtendrás 30° 30' 0.0\"")
+		elif self.funcion == 'Grados, Minutos y Segundos a Decimal':
+			mensaje = ("¡Hola! Esta función convierte ángulos de formato sexagesimal a decimal.\n\n"
+					   "¿Qué significa esto?\n"
+					   "- Formato sexagesimal: 45° 30' 45\" (grados, minutos y segundos)\n"
+					   "- Formato decimal: 45.5125° (un solo número con decimales)\n\n"
+					   "¿Cómo usarla?\n"
+					   "1. Escribe los grados (ejemplo: 45)\n"
+					   "2. Escribe los minutos (ejemplo: 30) - debe ser entre 0 y 59\n"
+					   "3. Escribe los segundos (ejemplo: 45) - debe ser entre 0 y 59.99\n"
+					   "4. Presiona Calcular\n"
+					   "5. El resultado aparecerá como: 45.5125°\n\n"
+					   "Ejemplo: 30° 30' 0\" = 30.5°")
 		else:
 			mensaje = "Función no soportada."
 		wx.MessageBox(mensaje, "Ayuda", wx.OK | wx.ICON_INFORMATION)

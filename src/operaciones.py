@@ -228,6 +228,64 @@ class Trigonometria:
 	def arco_tangente(valor):
 		return math.degrees(math.atan(valor))
 
+	@staticmethod
+	def decimal_a_dms(grados_decimales):
+		"""
+		Convierte grados decimales a formato sexagesimal (grados, minutos, segundos).
+		
+		Ejemplo: 45.5125° → 45° 30' 45"
+		
+		Parámetros:
+			grados_decimales (float): El ángulo en grados decimales.
+		
+		Retorna:
+			tuple: (grados, minutos, segundos) como enteros/float
+			str: Representación legible "G° M' S\""
+		"""
+		negativo = grados_decimales < 0
+		grados_decimales = abs(grados_decimales)
+		
+		grados = int(grados_decimales)
+		resto_minutos = (grados_decimales - grados) * 60
+		minutos = int(resto_minutos)
+		segundos = (resto_minutos - minutos) * 60
+		
+		if negativo:
+			grados = -grados
+		
+		# Retornar tanto la tupla como el string formateado
+		return (grados, minutos, round(segundos, 2), f"{grados}° {minutos}' {round(segundos, 2)}\"")
+
+	@staticmethod
+	def dms_a_decimal(grados, minutos, segundos):
+		"""
+		Convierte formato sexagesimal (grados, minutos, segundos) a grados decimales.
+		
+		Ejemplo: 45° 30' 45" → 45.5125°
+		
+		Parámetros:
+			grados (int): Los grados.
+			minutos (int): Los minutos (0-59).
+			segundos (float): Los segundos (0-59.99).
+		
+		Retorna:
+			float: El ángulo en grados decimales.
+		"""
+		if minutos < 0 or minutos >= 60:
+			raise ValueError("Los minutos deben estar entre 0 y 59.")
+		if segundos < 0 or segundos >= 60:
+			raise ValueError("Los segundos deben estar entre 0 y 59.99.")
+		
+		negativo = grados < 0
+		grados = abs(grados)
+		
+		decimal = grados + (minutos / 60) + (segundos / 3600)
+		
+		if negativo:
+			decimal = -decimal
+		
+		return decimal
+
 class CambioBases:
 	"""Clase para cambio de bases numéricas."""
 	@staticmethod
